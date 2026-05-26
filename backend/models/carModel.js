@@ -32,8 +32,12 @@ const carSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    images: [String],
-    available: {
+    images: [
+        {
+            url: String,
+            public_id: String,
+        }
+    ], available: {
         type: Boolean,
         default: true
     },
