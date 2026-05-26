@@ -1,4 +1,5 @@
 import carModel from "../models/carModel.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const AddCar = async (req, res) => {
 
@@ -61,10 +62,20 @@ export const RemoveCar = async (req, res) => {
         const { id } = req.params;
         const car = await carModel.findById(id);
         if (!car) {
-            return res.status(404).json({ success: false, message: "Car not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Car not found"
+            });
         }
 
-        // DELETE CAR
+        if (car.images && car.images.length > 0) {
+            for (const image of car.images) {
+                if (image.public_id) {
+                    await cloudinary.uploader.destroy(image.public_id);
+                }
+            }
+        }
+
         await carModel.findByIdAndDelete(id);
         return res.status(200).json({ success: true, message: "Car removed successfully" });
 

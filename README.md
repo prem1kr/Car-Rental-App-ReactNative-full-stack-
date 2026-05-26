@@ -200,11 +200,9 @@ CAR RENTAL APP
 │   └── package.json
 │
 └── README.md
+```
 
 ---
-
-# ⚙️ Installation
-
 ## 1️⃣ Clone Repository
 
 ```bash

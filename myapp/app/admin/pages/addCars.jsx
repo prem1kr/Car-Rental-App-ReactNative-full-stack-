@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
 import { setCarsRedux } from '../../../features/productSlice';
 import { addCar } from '../../../hooks/fetchCars';
+import { uploadImageToCloudinary } from '../../../components/upload';
 
 const fuelOptions = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
 
@@ -27,7 +28,11 @@ const AddCars = () => {
             return;
         }
 
-        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsMultipleSelection: true, quality: 1, });
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsMultipleSelection: true,
+            quality: 1,
+        });
         if (!result.canceled) {
             const selectedImages = result.assets.map(
                 (item) => item.uri
@@ -38,11 +43,34 @@ const AddCars = () => {
 
     const handleAddCar = async () => {
         try {
+
             if (!carName || !brand || !carNumber || !color || !fuelType || !price) {
                 Alert.alert('Error', 'Please fill all details');
                 return;
             }
 
+            if (images.length === 0) {
+                Alert.alert('Error', 'Please upload images');
+                return;
+            }
+
+            Alert.alert('Uploading', 'Please wait while images upload');
+
+            // Upload all images to cloudinary
+            const uploadedImages = [];
+
+            for (let i = 0; i < images.length; i++) {
+
+                const uploadedUrl = await uploadImageToCloudinary(images[i]);
+
+                if (uploadedUrl) {
+                    uploadedImages.push(uploadedUrl);
+                }
+            }
+
+            console.log(uploadedImages);
+
+            // Save car data in backend
             const response = await addCar({
                 carName,
                 brand,
@@ -50,12 +78,13 @@ const AddCars = () => {
                 color,
                 fuelType,
                 price,
-                images,
+                images: uploadedImages,
             });
 
-            console.log(response);
             dispatch(setCarsRedux(response.car));
+
             Alert.alert('Success', 'Car Added Successfully');
+
             setCarName('');
             setBrand('');
             setCarNumber('');
@@ -66,7 +95,11 @@ const AddCars = () => {
 
         } catch (error) {
             console.log(error);
-            Alert.alert('Error', error?.response?.data?.message || 'Something went wrong');
+
+            Alert.alert(
+                'Error',
+                error?.response?.data?.message || 'Something went wrong'
+            );
         }
     };
 

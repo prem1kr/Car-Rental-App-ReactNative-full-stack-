@@ -55,7 +55,8 @@ const Home = () => {
           style={styles.listContainer} data={filteredCars} keyExtractor={(item) => item.id} renderItem={({ item }) => (
 
             <Pressable style={styles.card}  >
-              <Image source={{ uri: item.images[0] }} style={styles.image} resizeMode="cover" onError={() => console.log("Image failed")} />
+              <Image source={{ uri: item?.images?.[0]?.url || 'https://via.placeholder.com/300' }}
+                style={styles.image} resizeMode="cover" />
 
               <View style={styles.info}>
                 <Text style={styles.name}>{item.carName.length > 11 ? item.carName.slice(0, 10) + '...' : item.carName}</Text>
