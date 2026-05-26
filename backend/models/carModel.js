@@ -37,7 +37,7 @@ images: [
       url: String,
       public_id: String,
    }
-]
+],
     available: {
         type: Boolean,
         default: true
