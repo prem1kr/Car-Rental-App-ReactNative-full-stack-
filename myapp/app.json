@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "drive now",
+    "slug": "myapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.premkr.myapp"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/icon.png"
+    },
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "97567eb2-3a76-4ec9-b2dd-3a6048221325"
+      }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
+  }
+}
