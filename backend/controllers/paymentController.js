@@ -1,49 +1,113 @@
+import bookingModel from "../models/bookingModel.js";
 import paymentModel from "../models/paymentModel.js";
 
-export const addPaymentCard = async (req, res) => {
+// CREATE PAYMENT
+export const createPaymentController = async (req, res) => {
     try {
-        const { userId, name, cardNumber, expiry, cvv } = req.body;
-        if (!userId || !name || !cardNumber || !expiry || !cvv) {
-            return res.status(400).json({success: false,message: "All fields are required"});
+        const { bookingId, userId, amount, paymentMethod, transactionId } = req.body;
+        if (!bookingId || !userId || !amount || !paymentMethod) {
+            return res.status(400).send({ success: false, message: "Please provide all fields" });
         }
 
+        const booking = await bookingModel.findById(bookingId);
+        if (!booking) {
+            return res.status(404).send({ success: false, message: "Booking not found" });
+        }
+
+        // create payment
         const payment = await paymentModel.create({
+            bookingId,
             userId,
-            name,
-            cardNumber,
-            expiry,
-            cvv,
+            amount,
+            paymentMethod,
+            transactionId,
+            paymentStatus: "Paid",
         });
-        res.status(201).json({success: true,message: "Card added successfully",payment});
+
+        // update booking payment status
+        booking.paymentStatus = "Paid";
+        booking.paymentMethod = paymentMethod;
+        // optional:
+        booking.status = "Confirmed";
+        await booking.save();
+
+        res.status(201).send({ success: true, message: "Payment completed successfully", payment });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({success: false, message: "Server Error"});
+        res.status(500).send({ success: false, message: "Error in payment API", error });
     }
 };
 
 
-export const getPaymentCards = async (req, res) => {
+
+// GET ALL PAYMENTS
+export const getAllPaymentsController = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const payments = await paymentModel.find({ userId });
-        res.status(200).json({success: true,payments});
+        const payments = await paymentModel.find().populate("userId").populate("bookingId").sort({ createdAt: -1 });
+        res.status(200).send({ success: true, total: payments.length, payments });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({success: false,message: "Server Error"});
+        res.status(500).send({ success: false, message: "Error while getting payments", error });
     }
 };
 
 
-export const deletePaymentCard = async (req, res) => {
+
+// GET SINGLE PAYMENT
+export const getSinglePaymentController = async (req, res) => {
     try {
-        const { cardId } = req.params;
-        await paymentModel.findByIdAndDelete(cardId);
-        res.status(200).json({success: true,message: "Card deleted successfully"});
+        const payment = await paymentModel.findById(req.params.id).populate("userId").populate("bookingId");
+        if (!payment) {
+            return res.status(404).send({ success: false, message: "Payment not found" });
+        }
+
+        res.status(200).send({ success: true, payment });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({success: false, message: "Server Error"});
+        res.status(500).send({ success: false, message: "Error while getting payment", error });
+    }
+};
+
+
+
+// UPDATE PAYMENT STATUS
+export const updatePaymentStatusController = async (req, res) => {
+    try {
+        const { paymentStatus } = req.body;
+        const payment = await pay.findByIdAndUpdate(req.params.id,
+            { paymentStatus },
+            { new: true }
+        );
+
+        if (!payment) {
+            return res.status(404).send({ success: false, message: "Payment not found" });
+        }
+
+        res.status(200).send({ success: true, message: "Payment status updated", payment });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ success: false, message: "Error while updating payment", error });
+    }
+};
+
+
+
+// DELETE PAYMENT
+export const deletePaymentController = async (req, res) => {
+    try {
+        const payment = await Payment.findByIdAndDelete(req.params.id);
+        if (!payment) {
+            return res.status(404).send({ success: false, message: "Payment not found" });
+        }
+
+        res.status(200).send({ success: true, message: "Payment deleted successfully", });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ success: false, message: "Error while deleting payment", error });
     }
 };

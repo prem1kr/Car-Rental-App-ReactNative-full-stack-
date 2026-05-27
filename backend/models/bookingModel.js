@@ -72,10 +72,6 @@ const bookingSchema = new mongoose.Schema(
             default: "Cash",
         },
 
-    },
-    {
-        timestamps: true,
-    }
-);
+    }, { timestamps: true });
 
 export default mongoose.model("Booking", bookingSchema);

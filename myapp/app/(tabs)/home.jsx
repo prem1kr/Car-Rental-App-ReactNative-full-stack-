@@ -4,7 +4,7 @@ import Navbar from '@/components/navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '@/components/header';
 import DiscountSlider from '@/components/discountSlider';
-import BookingModal from '../../components/booking';
+import BookingModal from '../../components/bookingModal';
 import { carData } from '../../hooks/fetchCars';
 import { setCars } from '../../features/productSlice';
 

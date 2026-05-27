@@ -5,10 +5,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux';
 import { createBooking } from '../hooks/useBooking';
 import { setBookingRedux } from '../features/bookingSlice';
+import { useRouter } from 'expo-router';
 // import MapLocationPicker from './MapLocationPicker';
 
 const BookingModal = ({ visible, onClose, car, userId }) => {
-
+    const router = useRouter();
     const dispatch = useDispatch();
     const [pickupDate, setPickupDate] = useState(null);
     const [returnDate, setReturnDate] = useState(null);
@@ -61,6 +62,10 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
             setDropLocation('');
             setPaymentMethod('Cash');
             onClose();
+            router.push({
+                pathname: "/paymentModal",
+                params: { booking: JSON.stringify(response.booking) }
+            });
         } else {
             Alert.alert('Error', response?.message);
         }
@@ -170,9 +175,8 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                 </View>
             </Modal>
 
-            {/* 
-            // Map Picker
-            <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
+
+            {/* <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
                 onSelectLocation={({ latitude, longitude }) => {
                     const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
                     if (selectingType === 'pickup') {

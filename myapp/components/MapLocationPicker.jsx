@@ -3,7 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } 
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 
-const GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY";
+const GOOGLE_API_KEY = "AIzaSyCfReUxeYM09BiDk-GjlOnPaa4u8HDXAfw";
 
 const MapLocationPicker = ({ visible, onClose, mapRegion, onSelectLocation }) => {
     const [selectedLocation, setSelectedLocation] = useState(null);

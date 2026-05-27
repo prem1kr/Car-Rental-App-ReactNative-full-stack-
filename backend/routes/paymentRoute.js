@@ -1,10 +1,12 @@
 import express from "express";
-import { addPaymentCard, deletePaymentCard, getPaymentCards } from "../controllers/paymentController.js";
+import { createPaymentController, deletePaymentController, getAllPaymentsController, getSinglePaymentController, updatePaymentStatusController } from "../controllers/paymentController.js";
 
-const paymentRoute = express.Router();
+const paymentsRouter = express.Router();
 
-paymentRoute.post("/add-card", addPaymentCard);
-paymentRoute.get("/get-cards/:userId", getPaymentCards);
-paymentRoute.delete("/delete-card/:cardId", deletePaymentCard);
+paymentsRouter.post("/create-payments", createPaymentController);
+paymentsRouter.get("/all-payments", getAllPaymentsController);
+paymentsRouter.get("/payments/:id", getSinglePaymentController);
+paymentsRouter.put("/update-payments-status/:id", updatePaymentStatusController);
+paymentsRouter.delete("/delete-payments/:id", deletePaymentController);
 
-export default paymentRoute;
+export default paymentsRouter;

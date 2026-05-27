@@ -61,7 +61,7 @@ const BookingHistory = () => {
         const Reviewed = review.some((r) => r.carId?._id === item?.carId?._id);
         return (
             <View style={styles.card}>
-                <CarImageSlider photos={item?.carId?.images || []} />
+                <CarImageSlider photos={item?.carId?.images || item?.images || []} />
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                     <Text style={styles.statusText}>{item.status}</Text>
                 </View>

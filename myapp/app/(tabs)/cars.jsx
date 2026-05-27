@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import CarImageSlider from '../../components/carImageSlider';
-import BookingModal from '../../components/booking';
+import BookingModal from '../../components/bookingModal';
 import { carData } from '../../hooks/fetchCars';
 import { setCars } from '../../features/productSlice';
 

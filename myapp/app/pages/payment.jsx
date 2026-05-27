@@ -95,10 +95,7 @@ const PaymentMethod = () => {
 
 
     const renderItem = ({ item }) => {
-        const last4 = item?.cardNumber
-            ? item.cardNumber.slice(-4)
-            : "XXXX";
-
+        const last4 = item?.cardNumber ? item.cardNumber.slice(-4) : "XXXX";
         const masked = `**** **** **** ${last4}`;
 
         return (
