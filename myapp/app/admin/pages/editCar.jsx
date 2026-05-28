@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import LoadingButton from '../../../components/loadingButton';
 
 const EditCarModal = ({ visible, onClose, onSave, car }) => {
     const [carName, setCarName] = useState(car?.carName || '');
     const [brand, setBrand] = useState(car?.brand || '');
     const [price, setPrice] = useState(car?.price || '');
+    const [loading, setLoading] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        try {
+            setLoading(true);
+            const updatedData = {
+                carName,
+                brand,
+                price
+            };
 
-        const updatedData = { carName,
-            brand,
-            price
-        };
+            onSave(updatedData);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
 
-        onSave(updatedData);
     };
 
     return (
@@ -34,9 +44,9 @@ const EditCarModal = ({ visible, onClose, onSave, car }) => {
                                 <Text style={styles.buttonText}> Cancel </Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.saveButton} onPress={handleSave} >
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveButton} onPress={handleSave} >
                                 <Text style={styles.buttonText}> Save </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
 
                         </View>
                     </ScrollView>

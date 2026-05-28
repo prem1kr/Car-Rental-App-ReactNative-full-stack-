@@ -8,10 +8,12 @@ import { addPaymentCard, getPaymentCards, deletePaymentCard } from "../../hooks/
 import { setCardsRedux, addCardRedux, deleteCardRedux } from "../../features/paymentCardSlice";
 import { userInfo } from '../../hooks/useUser';
 import { setUser } from '../../features/userSlice';
+import LoadingButton from '../../components/loadingButton';
 
 const PaymentMethod = () => {
     const router = useRouter();
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const user = useSelector((state) => state.user.user || {});
     const cards = useSelector((state) => state.payment.cards || []);
     const [showForm, setShowForm] = useState(false);
@@ -52,6 +54,7 @@ const PaymentMethod = () => {
             return;
         }
         try {
+            setLoading(true);
             const data = {
                 userId: user?.id,
                 name: form.name,
@@ -68,6 +71,8 @@ const PaymentMethod = () => {
             setShowForm(false);
         } catch (err) {
             console.log(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -147,9 +152,9 @@ const PaymentMethod = () => {
                                 <TextInput placeholder="CVV" style={[styles.input, { flex: 1 }]} keyboardType="numeric" value={form.cvv} onChangeText={(text) => setForm({ ...form, cvv: text })} />
                             </View>
 
-                            <TouchableOpacity style={styles.saveBtn} onPress={handleAddCard} >
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleAddCard} >
                                 <Text style={styles.saveText}>  Save Card </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>
                     )}
                 </ScrollView>

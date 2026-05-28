@@ -8,31 +8,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setCars } from '@/features/productSlice';
 import { setUser } from '@/features/userSlice';
 import { carData } from '../hooks/fetchCars';
+import { userInfo } from '../hooks/useUser';
 
 function AppInitializer() {
   const dispatch = useDispatch();
   useCurrentLocation();
 
-    const userData = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem("user");
-        if (storedUser) {
-          dispatch(setUser(JSON.parse(storedUser)));
-        }
-
-        const response = await carData();
-        if (response?.success) {
-          dispatch(setCars(response.cars));
-        }
-
-      } catch (error) {
-        console.log(error);
+  const userData = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        dispatch(setUser(JSON.parse(storedUser)));
+      } else {
+        const response = await userInfo();
+        dispatch(setUser(response.user));
       }
-    };
+      const response = await carData();
+      if (response?.success) {
+        dispatch(setCars(response.cars));
+      }
 
-    useEffect(()=>{
-       userData();
-    },[]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    userData();
+  }, []);
 
   return null;
 }

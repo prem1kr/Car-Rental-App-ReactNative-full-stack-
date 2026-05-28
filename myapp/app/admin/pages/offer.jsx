@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {  useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { AddOffers, deleteOffers, getOffers } from '../../../hooks/offers';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDeleteOffer, setOffer, setOfferRedux } from '../../../features/offerSlice';
+import LoadingButton from '../../../components/loadingButton';
 
 const AddOffer = () => {
     const router = useRouter();
@@ -15,6 +16,7 @@ const AddOffer = () => {
     const [validity, setValidity] = useState('');
     const dispatch = useDispatch();
     const offer = useSelector(state => state.offer.offer || []);
+    const [loading, setLoading] = useState(false);
 
     const handleAddOffer = async () => {
         if (!offerTitle || !discount || !description || !code || !validity) {
@@ -22,6 +24,7 @@ const AddOffer = () => {
             return;
         }
         try {
+            setLoading(true);
             const data = { title: offerTitle, discount, description, code, validity };
             const response = await AddOffers(data);
             dispatch(setOfferRedux(response.offers));
@@ -35,6 +38,8 @@ const AddOffer = () => {
         } catch (error) {
             console.log(error);
             Alert.alert('Error', 'Something went wrong');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -106,10 +111,10 @@ const AddOffer = () => {
                                 <TextInput placeholder="Validity Date" placeholderTextColor="#9CA3AF" style={styles.input} value={validity} onChangeText={setValidity} />
                             </View>
 
-                            <TouchableOpacity style={styles.addButton} onPress={handleAddOffer}>
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddOffer}>
                                 <Ionicons name="add-circle-outline" size={22} color="#fff" />
                                 <Text style={styles.buttonText}> Add Offer </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
 
                         </View>
 

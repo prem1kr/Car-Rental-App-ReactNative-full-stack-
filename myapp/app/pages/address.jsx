@@ -7,9 +7,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addAddress, getUserAddresses, updateAddress, deleteAddress, setDefaultAddress } from '../../hooks/useAddress';
 import { setAddressesRedux, addAddressRedux, updateAddressRedux, deleteAddressRedux, setDefaultAddressRedux } from '../../features/addressSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingButton from '../../components/loadingButton';
 
 const AddressPage = () => {
-
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector(state => state.user.user || []);
@@ -40,7 +41,7 @@ const AddressPage = () => {
             console.log(error);
         }
     };
-     
+
     useEffect(() => {
         if (user?._id || user?.id) {
             fetchAddresses();
@@ -59,6 +60,7 @@ const AddressPage = () => {
             return;
         }
         try {
+            setLoading(true);
             if (editIndex !== null) {
                 const response = await updateAddress(editIndex, form);
                 if (response?.success) {
@@ -85,6 +87,8 @@ const AddressPage = () => {
 
         } catch (error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -123,9 +127,6 @@ const AddressPage = () => {
             console.log(error);
         }
     };
-
-
-
 
     const renderItem = ({ item }) => (
         <View style={styles.card}>
@@ -182,9 +183,9 @@ const AddressPage = () => {
                             <TextInput placeholder="State" style={styles.input} value={form.state} onChangeText={(text) => handleChange('state', text)} />
                             <TextInput placeholder="Pincode" style={styles.input} keyboardType="numeric" value={form.pincode} onChangeText={(text) => handleChange('pincode', text)} />
 
-                            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
                                 <Text style={styles.saveText}>Save Address</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
 
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
                                 <Text style={styles.cancel}>Cancel</Text>

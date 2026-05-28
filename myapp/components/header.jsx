@@ -6,15 +6,10 @@ export default function Header() {
     return (
         <LinearGradient colors={['#0f2027', '#203a43', '#2c5364']} style={styles.container} >
             <View style={styles.content}>
-
                 <Image source={require('../assets/images/icon.png')} style={styles.logo} />
                 <Text style={styles.title}>Drive Your Journey</Text>
                 <Text style={styles.subtitle}>Your Way</Text>
-
-                <Text style={styles.desc}>
-                    Rent the perfect car for any occasion and explore the world with comfort.
-                </Text>
-                
+                <Text style={styles.desc}> Rent the perfect car for any occasion and explore the world with comfort. </Text>
             </View>
 
             <View style={styles.card}>
@@ -55,7 +50,7 @@ const styles = StyleSheet.create({
     logo: {
         width: 40,
         height: 40,
-        alignSelf:'center'
+        alignSelf: 'center'
     },
 
     title: {

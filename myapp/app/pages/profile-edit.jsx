@@ -5,11 +5,13 @@ import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { ProfileData, ProfileUpdate } from '../../hooks/useProfile';
 import { setProfile } from '../../features/profileSlice';
+import LoadingButton from '../../components/loadingButton';
 
 const EditProfile = () => {
     const user = useSelector(state => state.user.user || {});
     const profile = useSelector(state => state.profile.profile || {});
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
 
     const router = useRouter();
     const [form, setForm] = useState({
@@ -38,11 +40,19 @@ const EditProfile = () => {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
     const handleSave = async () => {
-        const response = await ProfileUpdate(form);
-        if (response?.success) {
-            dispatch(setProfile(response.profile));
-            console.log("Updated Profile:", form);
+        try {
+            setLoading(true);
+            const response = await ProfileUpdate(form);
+            if (response?.success) {
+                dispatch(setProfile(response.profile));
+                console.log("Updated Profile:", form);
 
+            }
+
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
     const fetchProfile = async () => {
@@ -89,9 +99,9 @@ const EditProfile = () => {
                         <TextInput placeholder="License Expiry Date (DD/MM/YYYY)" style={styles.input} value={form.expiry} onChangeText={(text) => handleChange('expiry', text)} />
                         <Text style={styles.sectionTitle}>Emergency Contact</Text>
                         <TextInput placeholder="Emergency Contact Number" style={styles.input} keyboardType="phone-pad" value={form.contact} onChangeText={(text) => handleChange('contact', text)} />
-                        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+                        {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
                             <Text style={styles.saveText}>Save Changes</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView >

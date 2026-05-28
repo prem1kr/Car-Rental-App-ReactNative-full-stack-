@@ -1,46 +1,25 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    Modal,
-    StyleSheet,
-    TouchableOpacity,
-    TextInput,
-    ActivityIndicator,
-} from 'react-native';
-
+import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { applyReferal } from '../hooks/useReferal'; 
+import { applyReferal } from '../hooks/useReferal';
+import LoadingButton from './loadingButton';
 
 const ApplyReferralPopup = ({ visible, onClose, onSuccess }) => {
-
     const [referralCode, setReferralCode] = useState("");
     const [loading, setLoading] = useState(false);
-
     const handleApplyReferral = async () => {
         try {
-
             if (!referralCode) {
                 return alert("Please enter referral code");
             }
-
             setLoading(true);
-
             const userId = await AsyncStorage.getItem("userId");
-
-            const response = await applyReferal(
-                userId,
-                referralCode
-            );
+            const response = await applyReferal(userId, referralCode);
 
             if (response.success) {
-
                 alert(response.message);
-
                 setReferralCode("");
-
                 onClose();
-
                 if (onSuccess) {
                     onSuccess();
                 }
@@ -57,63 +36,25 @@ const ApplyReferralPopup = ({ visible, onClose, onSuccess }) => {
     };
 
     return (
-        <Modal
-            visible={visible}
-            transparent={true}
-            animationType="slide"
-        >
-
+        <Modal visible={visible} transparent={true} animationType="slide">
             <View style={styles.overlay}>
 
                 <View style={styles.popup}>
-
-                    <Text style={styles.title}>
-                        Apply Referral Code
-                    </Text>
-
-                    <TextInput
-                        placeholder="Enter referral code"
-                        value={referralCode}
-                        onChangeText={setReferralCode}
-                        style={styles.input}
-                        autoCapitalize="characters"
-                    />
+                    <Text style={styles.title}>  Apply Referral Code  </Text>
+                    <TextInput placeholder="Enter referral code" value={referralCode} onChangeText={setReferralCode} style={styles.input} autoCapitalize="characters" />
 
                     <View style={styles.buttonContainer}>
-
-                        <TouchableOpacity
-                            style={[styles.button, styles.cancelButton]}
-                            onPress={onClose}
-                        >
-                            <Text style={styles.cancelText}>
-                                Cancel
-                            </Text>
+                        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose} >
+                            <Text style={styles.cancelText}> Cancel</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={[styles.button, styles.applyButton]}
-                            onPress={handleApplyReferral}
-                            disabled={loading}
-                        >
-
-                            {
-                                loading ? (
-                                    <ActivityIndicator color="#fff" />
-                                ) : (
-                                    <Text style={styles.applyText}>
-                                        Apply
-                                    </Text>
-                                )
-                            }
-
-                        </TouchableOpacity>
+                        {loading ? <LoadingButton /> : <TouchableOpacity style={[styles.button, styles.applyButton]} onPress={handleApplyReferral} disabled={loading} >
+                            <Text style={styles.applyText}>  Apply  </Text>
+                        </TouchableOpacity>}
 
                     </View>
-
                 </View>
-
             </View>
-
         </Modal>
     );
 };

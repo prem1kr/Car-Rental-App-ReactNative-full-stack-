@@ -17,10 +17,10 @@ const Signup = () => {
 
     const handleSignup = async () => {
         try {
-            setLoading(true);
             if (!email || !password || !name || !role) {
                 return Alert.alert("Error", "Please enter email and password");
             }
+            setLoading(true);
             const res = await axios.post("https://car-rental-app-backend-wxdr.onrender.com/api/auth/signup",
                 {
                     role: role,

@@ -12,17 +12,22 @@ Admins can manage cars, users, bookings, analytics, and live customer chats thro
 
 - User Authentication (Login / Register)
 - JWT Authentication & Secure Sessions
-- Role-Based Access Control
+- Role-Based Access Control (Admin / User)
 - Browse Available Cars
-- Search & Filter Cars
+- Search Cars
 - Car Booking System
+- Edit & Delete Cars (Admin)
 - Real-Time Booking Updates
 - Booking History
 - User Profile Management
 - Refer & Earn System
 - Real-Time Chat Support
 - Current Location Access
+- Review & Rating system
+- Saved Addres & Payment Method System
+- Real time Notification & Offers Update System
 - Responsive & Modern UI
+
 
 ---
 
@@ -33,7 +38,6 @@ Admins can manage cars, users, bookings, analytics, and live customer chats thro
 - Instant Messaging
 - Socket.IO Integration
 - Real-Time Updates
-- Persistent Socket Connections
 
 ---
 
@@ -46,7 +50,6 @@ Admins can manage cars, users, bookings, analytics, and live customer chats thro
 - Car Management
 - User Management
 - Revenue Tracking
-- Dynamic Activity Feed
 - Live Chat Monitoring
 - Real-Time Statistics
 
@@ -62,7 +65,6 @@ DriveNow uses Cloudinary for image storage and optimization.
 - Cloud-Based Media Storage
 - Optimized Image Delivery
 - Secure Image Hosting
-- Fast CDN Performance
 
 ---
 

@@ -1,31 +1,24 @@
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Pressable, Alert } from 'react-native';
-import React, { use } from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '../pages/navbar';
 import { Action, Item, Section } from '@/components/profileComponents';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { removeUser } from '../../../features/userSlice';
-import { userInfo } from '../../../hooks/useUser';
+import { getAllReview } from '../../../hooks/useReview';
+import { setReview } from '../../../features/reviewSlice';
 
 const Profile = () => {
   const router = useRouter();
   const user = useSelector(state => state.user.user || {});
   const userName = user?.name;
   const dispatch = useDispatch();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchUser = async () => {
-        if (user.length === 0) {
-          await userInfo();
-        }
-      };
-      fetchUser();
-    }, [user])
-  );
+  const reviews = useSelector(state => state.review.review || []);
+  const rating = reviews.reduce((sum, item) => sum + item.rating, 0);
+  const averageRating = rating / reviews.length;
 
   const handleLogout = async () => {
     try {
@@ -41,12 +34,23 @@ const Profile = () => {
     }
   }
 
+  const fetchReviews = async () => {
+    const response = await getAllReview();
+    if (response.success) {
+      dispatch(setReview(response.reviews));
+    }
+  }
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
   return (
 
     <SafeAreaView style={styles.container}>
       <Navbar />
-      <ScrollView style={styles.secondcontainer}contentContainerStyle={{ paddingBottom: 50 }}>
-        
+      <ScrollView style={styles.secondcontainer} contentContainerStyle={{ paddingBottom: 50 }}>
+
         <LinearGradient colors={['#0f2027', '#203a43', '#2c5364']} style={styles.header}>
           <View>
             <Text style={styles.name}>{userName}</Text>
@@ -54,7 +58,7 @@ const Profile = () => {
           </View>
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>⭐ 4.5</Text>
+            <Text style={styles.badgeText}>⭐ {averageRating}</Text>
           </View>
         </LinearGradient>
 

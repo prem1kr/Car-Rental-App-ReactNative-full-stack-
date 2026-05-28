@@ -6,11 +6,13 @@ import { useDispatch } from 'react-redux';
 import { createBooking } from '../hooks/useBooking';
 import { setBookingRedux } from '../features/bookingSlice';
 import { useRouter } from 'expo-router';
+import LoadingButton from './loadingButton';
 // import MapLocationPicker from './MapLocationPicker';
 
 const BookingModal = ({ visible, onClose, car, userId }) => {
     const router = useRouter();
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const [pickupDate, setPickupDate] = useState(null);
     const [returnDate, setReturnDate] = useState(null);
     const [showPickupPicker, setShowPickupPicker] = useState(false);
@@ -32,42 +34,49 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
     };
 
     const handleBooking = async () => {
-        if (!pickupDate || !returnDate || !pickupLocation || !dropLocation) {
-            Alert.alert('Error', 'Please fill all fields');
-            return;
-        }
-        if (returnDate < pickupDate) {
-            Alert.alert('Error', 'Return date must be after pickup date');
-            return;
-        }
+        try {
+            if (!pickupDate || !returnDate || !pickupLocation || !dropLocation) {
+                Alert.alert('Error', 'Please fill all fields');
+                return;
+            }
+            if (returnDate < pickupDate) {
+                Alert.alert('Error', 'Return date must be after pickup date');
+                return;
+            }
+            setLoading(true);
+            const bookingData = {
+                userId,
+                carId: car?._id,
+                pickupDate,
+                returnDate,
+                pickupLocation,
+                dropLocation,
+                totalPrice: Number(car?.price),
+                paymentMethod,
+            };
 
-        const bookingData = {
-            userId,
-            carId: car?._id,
-            pickupDate,
-            returnDate,
-            pickupLocation,
-            dropLocation,
-            totalPrice: Number(car?.price),
-            paymentMethod,
-        };
+            const response = await createBooking(bookingData);
+            if (response?.success) {
+                dispatch(setBookingRedux(response.booking));
+                Alert.alert('Success', response?.message);
+                setPickupDate(null);
+                setReturnDate(null);
+                setPickupLocation('');
+                setDropLocation('');
+                setPaymentMethod('Cash');
+                onClose();
+                router.push({
+                    pathname: "/pages/payments",
+                    params: { booking: JSON.stringify(response.booking) }
+                });
+            } else {
+                Alert.alert('Error', response?.message);
+            }
 
-        const response = await createBooking(bookingData);
-        if (response?.success) {
-            dispatch(setBookingRedux(response.booking));
-            Alert.alert('Success', response?.message);
-            setPickupDate(null);
-            setReturnDate(null);
-            setPickupLocation('');
-            setDropLocation('');
-            setPaymentMethod('Cash');
-            onClose();
-            router.push({
-                pathname: "/paymentModal",
-                params: { booking: JSON.stringify(response.booking) }
-            });
-        } else {
-            Alert.alert('Error', response?.message);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -86,12 +95,10 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
 
                                 <View style={styles.carCard}>
                                     <Ionicons name="car-sport-outline" size={30} color="#2563EB" />
-
                                     <View style={{ marginLeft: 12 }}>
                                         <Text style={styles.carName}> {car?.carName} </Text>
                                         <Text style={styles.brand}> {car?.brand} </Text>
                                     </View>
-
                                 </View>
 
                                 <TouchableOpacity style={styles.inputContainer} onPress={() => setShowPickupPicker(true)} >
@@ -160,10 +167,10 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                     <Text style={styles.price}> ₹{car?.price} </Text>
                                 </View>
 
-                                <TouchableOpacity style={styles.bookBtn} onPress={handleBooking} >
+                                {loading ? <LoadingButton /> : <TouchableOpacity style={styles.bookBtn} onPress={handleBooking} >
                                     <Ionicons name="checkmark-circle-outline" size={22} color="#fff" />
                                     <Text style={styles.bookBtnText}> Confirm Booking</Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity>}
 
                                 <TouchableOpacity style={styles.cancelBtn} onPress={onClose} >
                                     <Text style={styles.cancelText}>  Cancel  </Text>

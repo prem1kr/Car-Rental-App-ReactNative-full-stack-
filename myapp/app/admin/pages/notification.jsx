@@ -5,6 +5,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { AddNotification, GetNotification } from '../../../hooks/useNotification';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNotificationRedux, setNotification } from '../../../features/notificationSlice';
+import LoadingButton from '../../../components/loadingButton';
 
 const AdminNotification = () => {
     const router = useRouter();
@@ -12,23 +13,27 @@ const AdminNotification = () => {
     const [message, setMessage] = useState('');
     const dispatch = useDispatch();
     const notification = useSelector(state => state.notification.notification || []);
+    const [loading, setLoading] = useState(false);
 
     const handleAddNotification = async () => {
-        if (!title || !message) {
-            Alert.alert('Error', 'Please fill all fields');
-            return;
-        }
-        const notificationData = {
-            title,
-            message,
-        };
-
-        const response = await AddNotification(notificationData);
-        if (response?.success && response?.newNotification) {
-            dispatch(addNotificationRedux(response.newNotification));
-            setTitle('');
-            setMessage('');
-            Alert.alert('Success', 'Notification Added');
+        try {
+            if (!title || !message) {
+                Alert.alert('Error', 'Please fill all fields');
+                return;
+            }
+            setLoading(true);
+            const notificationData = { title, message, };
+            const response = await AddNotification(notificationData);
+            if (response?.success && response?.newNotification) {
+                dispatch(addNotificationRedux(response.newNotification));
+                setTitle('');
+                setMessage('');
+                Alert.alert('Success', 'Notification Added');
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -81,10 +86,10 @@ const AdminNotification = () => {
                                 <TextInput placeholder="Write notification message..." placeholderTextColor="#9CA3AF" multiline value={message} onChangeText={setMessage} style={styles.messageInput} />
                             </View>
 
-                            <TouchableOpacity style={styles.addButton} onPress={handleAddNotification}>
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddNotification}>
                                 <Ionicons name="add-circle-outline" size={22} color="#fff" />
                                 <Text style={styles.buttonText}> Add Notification </Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
 
                         </View>
 

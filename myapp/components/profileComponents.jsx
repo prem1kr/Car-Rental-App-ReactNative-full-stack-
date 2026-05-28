@@ -23,7 +23,6 @@ export const Item = ({ icon, title, subtitle, onPress }) => (
       <Text style={styles.itemTitle}>{title}</Text>
       {subtitle ? <Text style={styles.itemSubtitle}>{subtitle}</Text> : null}
     </View>
-
     <Ionicons name="chevron-forward" size={18} color="#999" />
   </TouchableOpacity>
 );

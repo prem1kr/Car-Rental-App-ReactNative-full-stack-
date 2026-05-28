@@ -6,11 +6,13 @@ import { Platform } from 'react-native';
 import { addReviews, deleteReview, getUserReviews } from '../../hooks/useReview';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDelteReview, setReview } from '../../features/reviewSlice';
+import LoadingButton from '../../components/loadingButton';
 
 const ReviewScreen = () => {
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const user = useSelector(state => state.user.user);
+    const user = useSelector(state => state.user.user || {});
     const userId = user?.id;
     const userName = user?.name;
     const { carId } = useLocalSearchParams();
@@ -22,13 +24,8 @@ const ReviewScreen = () => {
     const addReview = async () => {
         if (!comment || rating === 0) return;
         try {
-            const reviewData = {
-                userName,
-                rating,
-                comment,
-                carId,
-                userId,
-            };
+            setLoading(true);
+            const reviewData = { userName, rating, comment, carId, userId };
 
             const response = await addReviews(reviewData);
             if (response?.success) {
@@ -39,6 +36,8 @@ const ReviewScreen = () => {
             }
         } catch (error) {
             Alert.alert(error.response.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -134,13 +133,13 @@ const ReviewScreen = () => {
                             </View>
 
                             <TextInput placeholder="Write your experience..." value={comment} onChangeText={setComment} style={styles.input} multiline />
-
-                            <TouchableOpacity style={styles.button} onPress={addReview}>
+                            
+                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.button} onPress={addReview}>
                                 <Text style={styles.buttonText}>Submit Review</Text>
                             </TouchableOpacity>
+                            }
 
                         </View>
-
 
                         <FlatList data={reviews} keyExtractor={(item) => item.id} renderItem={renderItem} showsVerticalScrollIndicator={false} />
                     </View>

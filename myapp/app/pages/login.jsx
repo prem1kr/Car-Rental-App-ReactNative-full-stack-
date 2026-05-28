@@ -19,11 +19,10 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
-            setLoading(true);
             if (!email || !password) {
                 return Alert.alert("Error", "Please enter email and password");
             }
-
+            setLoading(true);
             const res = await axios.post("https://car-rental-app-backend-wxdr.onrender.com/api/auth/login", { email, password });
 
             if (res.data.success) {

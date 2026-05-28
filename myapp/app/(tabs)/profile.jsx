@@ -1,30 +1,24 @@
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Pressable, Alert } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '@/components/navbar';
 import { Action, Item, Section } from '@/components/profileComponents';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeUser } from '../../features/userSlice';
 import { Logout } from '../../hooks/useLogout';
-import { userInfo } from '../../hooks/useUser';
+import { getUserReviews } from '../../hooks/useReview';
+import { setReview } from '../../features/reviewSlice';
 
 const Profile = () => {
   const router = useRouter();
   const user = useSelector(state => state.user.user || {});
   const userName = user?.name;
+  const userId = user?.id;
   const dispatch = useDispatch();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchUser = async () => {
-        if (user.length === 0) {
-          await userInfo();
-        }
-      };
-      fetchUser();
-    }, [user])
-  );
+  const reviews = useSelector(state => state.review.review || []);
+  const rating = reviews.reduce((sum, item) => sum + item.rating, 0);
+  const averateRating = rating / reviews.length;
 
   const handleLogout = async () => {
     await Logout();
@@ -32,10 +26,21 @@ const Profile = () => {
     router.replace('/pages/login');
   }
 
+  const fetchUserReview = async () => {
+    const response = await getUserReviews(userId);
+    if (response.success) {
+      dispatch(setReview(response.review));
+    }
+  }
+
+  useEffect(() => {
+    fetchUserReview();
+  }, [userId]);
+
   return (
     <SafeAreaView style={styles.container}>
       <Navbar />
-      <ScrollView style={styles.secondcontainer}contentContainerStyle={{ paddingBottom: 50 }}>
+      <ScrollView style={styles.secondcontainer} contentContainerStyle={{ paddingBottom: 50 }}>
 
         <LinearGradient colors={['#0f2027', '#203a43', '#2c5364']} style={styles.header}>
           <View>
@@ -44,7 +49,7 @@ const Profile = () => {
           </View>
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>⭐ 4.5</Text>
+            <Text style={styles.badgeText}>⭐ {averateRating}</Text>
           </View>
         </LinearGradient>
 
@@ -63,7 +68,7 @@ const Profile = () => {
         <Section title="Account Settings">
           <Item icon="person-outline" title="Edit Profile" onPress={() => router.push('/pages/profile-edit')} />
           <Item icon="location-outline" title="Saved Addresses" onPress={() => router.push('/pages/address')} />
-          <Item icon="card-outline" title="Payment Methods" onPress={() => router.push('/pages/payment')} />
+          <Item icon="card-outline" title="Payment Methods" onPress={() => router.push('/pages/paymentCards')} />
           <Item icon="notifications-outline" title="Notifications" onPress={() => router.push('/pages/notification')} />
           <Item icon="shield-checkmark-outline" title="Privacy & Security" />
         </Section>

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { createPayments } from "../hooks/usePayments";
+import { createPayments } from "../../hooks/usePayments";
+import LoadingButton from "../../components/loadingButton";
 
 
 const PaymentScreen = () => {
-    const { booking } = useLocalSearchParams();
     const router = useRouter();
+    const { booking } = useLocalSearchParams();
     const bookingData = JSON.parse(booking);
     const [paymentMethod, setPaymentMethod] = useState("UPI");
     const [transactionId, setTransactionId] = useState("");
@@ -16,11 +16,10 @@ const PaymentScreen = () => {
 
     const handlePayment = async () => {
         try {
-            setLoading(true);
             if (paymentMethod !== "Cash" && !transactionId) {
                 return Alert.alert("Error", "Please enter transaction ID");
             }
-
+            setLoading(true);
             const payload = {
                 bookingId: bookingData?._id,
                 userId: bookingData?.userId,
@@ -51,12 +50,10 @@ const PaymentScreen = () => {
             <ScrollView showsVerticalScrollIndicator={false}>
 
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} >
+                    <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="#000" />
                     </TouchableOpacity>
-
-                    <Text style={styles.headerTitle}> Payment </Text>
-                    <View style={{ width: 24 }} />
+                    <Text style={styles.headerTitle}>Payments</Text>
                 </View>
 
 
@@ -126,13 +123,9 @@ const PaymentScreen = () => {
                 )
                 }
 
-                <TouchableOpacity style={styles.payBtn} onPress={handlePayment} disabled={loading} >
-
-                    {loading ? (<ActivityIndicator color="#fff" />) : (
-                        <Text style={styles.payBtnText}>  Pay ₹ {bookingData?.totalPrice} </Text>
-                    )}
-
-                </TouchableOpacity>
+                {loading ? <LoadingButton /> : <TouchableOpacity style={styles.payBtn} onPress={handlePayment} disabled={loading} >
+                    <Text style={styles.payBtnText}>  Pay ₹ {bookingData?.totalPrice} </Text>
+                </TouchableOpacity>}
             </ScrollView>
         </SafeAreaView>
     );
@@ -149,16 +142,21 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 20,
+        height: 70,
+        backgroundColor: '#4ec28d',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingTop: 20,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
     },
 
     headerTitle: {
         fontSize: 22,
-        fontWeight: "700",
-        color: "#000",
+        fontWeight: '700',
+        marginLeft: 60,
     },
 
     card: {

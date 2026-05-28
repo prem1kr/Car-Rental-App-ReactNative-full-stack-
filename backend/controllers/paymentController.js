@@ -1,7 +1,6 @@
 import bookingModel from "../models/bookingModel.js";
 import paymentModel from "../models/paymentModel.js";
 
-// CREATE PAYMENT
 export const createPaymentController = async (req, res) => {
     try {
         const { bookingId, userId, amount, paymentMethod, transactionId } = req.body;
@@ -14,7 +13,6 @@ export const createPaymentController = async (req, res) => {
             return res.status(404).send({ success: false, message: "Booking not found" });
         }
 
-        // create payment
         const payment = await paymentModel.create({
             bookingId,
             userId,
@@ -24,10 +22,8 @@ export const createPaymentController = async (req, res) => {
             paymentStatus: "Paid",
         });
 
-        // update booking payment status
         booking.paymentStatus = "Paid";
         booking.paymentMethod = paymentMethod;
-        // optional:
         booking.status = "Confirmed";
         await booking.save();
 
@@ -41,7 +37,6 @@ export const createPaymentController = async (req, res) => {
 
 
 
-// GET ALL PAYMENTS
 export const getAllPaymentsController = async (req, res) => {
     try {
         const payments = await paymentModel.find().populate("userId").populate("bookingId").sort({ createdAt: -1 });
@@ -55,7 +50,6 @@ export const getAllPaymentsController = async (req, res) => {
 
 
 
-// GET SINGLE PAYMENT
 export const getSinglePaymentController = async (req, res) => {
     try {
         const payment = await paymentModel.findById(req.params.id).populate("userId").populate("bookingId");
@@ -73,11 +67,10 @@ export const getSinglePaymentController = async (req, res) => {
 
 
 
-// UPDATE PAYMENT STATUS
 export const updatePaymentStatusController = async (req, res) => {
     try {
         const { paymentStatus } = req.body;
-        const payment = await pay.findByIdAndUpdate(req.params.id,
+        const payment = await paymentModel.findByIdAndUpdate(req.params.id,
             { paymentStatus },
             { new: true }
         );
@@ -96,10 +89,9 @@ export const updatePaymentStatusController = async (req, res) => {
 
 
 
-// DELETE PAYMENT
 export const deletePaymentController = async (req, res) => {
     try {
-        const payment = await Payment.findByIdAndDelete(req.params.id);
+        const payment = await paymentModel.findByIdAndDelete(req.params.id);
         if (!payment) {
             return res.status(404).send({ success: false, message: "Payment not found" });
         }

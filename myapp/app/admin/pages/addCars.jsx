@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { setCarsRedux } from '../../../features/productSlice';
 import { addCar } from '../../../hooks/fetchCars';
 import { uploadImageToCloudinary } from '../../../components/upload';
+import LoadingButton from '../../../components/loadingButton';
 
 const fuelOptions = ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'];
 
@@ -20,6 +21,7 @@ const AddCars = () => {
     const [fuelType, setFuelType] = useState('');
     const [images, setImages] = useState([]);
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
 
     const pickImages = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -55,6 +57,7 @@ const AddCars = () => {
             }
 
             Alert.alert('Uploading', 'Please wait while images upload');
+            setLoading(true);
 
             // Upload all images to cloudinary
             const uploadedImages = [];
@@ -100,6 +103,8 @@ const AddCars = () => {
                 'Error',
                 error?.response?.data?.message || 'Something went wrong'
             );
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -165,10 +170,10 @@ const AddCars = () => {
                             <TextInput placeholder="Price Per Day" placeholderTextColor="#9CA3AF" style={styles.input} keyboardType="numeric" value={price} onChangeText={setPrice} />
                         </View>
 
-                        <TouchableOpacity style={styles.addButton} onPress={handleAddCar}>
+                        {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddCar}>
                             <Ionicons name="add-circle-outline" size={22} color="#fff" />
                             <Text style={styles.buttonText}> Add Car </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
 
                     </ScrollView>
                 </ScrollView>
