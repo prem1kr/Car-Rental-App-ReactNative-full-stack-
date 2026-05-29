@@ -73,18 +73,20 @@ export const updateBookingStatus = async (req, res) => {
             { status },
             { new: true }
         );
-        
-        if(status === "Completed") {
+
+        if (status === "Completed") {
             await carModel.findByIdAndUpdate(
+                booking.paymentStatus = "Paid",
                 booking.carId,
-                {available:true}
+                { available: true }
             )
         }
 
-        if(status === "Confirmed"){
+        if (status === "Confirmed") {
             await carModel.findByIdAndUpdate(
+                booking.paymentStatus = "Paid",
                 booking.carId,
-                {available:false}
+                { available: false }
             )
         }
 
@@ -106,7 +108,8 @@ export const cancelBooking = async (req, res) => {
         }
 
         booking.status = "Cancelled";
-        await booking.save();
+        booking.paymentStatus = "Failed",
+            await booking.save();
         await carModel.findByIdAndUpdate(booking.carId,
             { available: true }
         );
