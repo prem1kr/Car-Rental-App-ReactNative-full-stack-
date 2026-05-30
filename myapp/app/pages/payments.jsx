@@ -1,18 +1,34 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Alert, ScrollView, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { createPayments } from "../../hooks/usePayments";
+import { createPayments, getSinglePayments } from "../../hooks/usePayments";
 import LoadingButton from "../../components/loadingButton";
-
+import { useDispatch } from 'react-redux';
+import { setPayments } from "../../features/paymentSlice";
+import VerifyingPaymentModal from "../../components/paymentVerifying";
+import PaymentSuccessModal from "../../components/paymentSuccessfull";
 
 const PaymentScreen = () => {
     const router = useRouter();
+    const dispatch = useDispatch();
     const { booking } = useLocalSearchParams();
     const bookingData = JSON.parse(booking);
     const [paymentMethod, setPaymentMethod] = useState("UPI");
     const [transactionId, setTransactionId] = useState("");
     const [loading, setLoading] = useState(false);
+    const [verifyVisible, setVerifyVisible] = useState(false);
+    const [paymentSuccessVisible, setPaymentSuccessVisible] = useState(false);
+    // const [paymentId , setPaymentId] = useState();
+
+
+    const startPaymentFlow = () => {
+        setVerifyVisible(true);
+        setTimeout(() => {
+            setVerifyVisible(false);
+            setPaymentSuccessVisible(true);
+        }, 5000);
+    };
 
     const handlePayment = async () => {
         try {
@@ -22,41 +38,63 @@ const PaymentScreen = () => {
             setLoading(true);
             const payload = {
                 bookingId: bookingData?._id,
-                userId: bookingData?.userId,
+                userId: bookingData?.userId?.toString?.() || bookingData?.userId,
                 amount: bookingData?.totalPrice,
-                paymentMethod,
+                paymentMethod: bookingData?.paymentMethod,
                 transactionId,
             };
-
             const res = await createPayments(payload);
             if (res.success) {
-                Alert.alert("Success", "Payment completed successfully");
-                navigation.navigate("Success");
+                // setPaymentId(res.payment._id);
+                dispatch(setPayments(res.payment));
+                startPaymentFlow();
             } else {
                 Alert.alert("Error", res.message);
             }
-
         } catch (error) {
-            console.log(error);
-            Alert.alert("Error", "Payment failed");
+
+            console.log(
+                "FULL ERROR =>",
+                error?.response?.data || error.message
+            );
+
+            Alert.alert(
+                "Error",
+                error?.response?.data?.message || "Payment failed"
+            );
+
 
         } finally {
             setLoading(false);
         }
     };
 
+    // const fetchPayment = async () => {
+    //     const response = await getSinglePayments(paymentId);
+    //     if (response.success) {
+    //         dispatch(setPayments(response.payment));
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     if (paymentId) {
+    //         fetchPayment();
+    //     }
+    // }, [paymentId]);
+
+
+
+
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Payments</Text>
+            </View>
+
             <ScrollView showsVerticalScrollIndicator={false}>
-
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => router.back()}>
-                        <Ionicons name="arrow-back" size={24} color="#000" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Payments</Text>
-                </View>
-
-
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}> Booking Details </Text>
 
@@ -120,14 +158,17 @@ const PaymentScreen = () => {
                         <Text style={styles.sectionTitle}> Transaction ID </Text>
                         <TextInput placeholder="Enter transaction ID" value={transactionId} onChangeText={setTransactionId} style={styles.input} placeholderTextColor="#999" />
                     </View>
-                )
-                }
+                )}
 
                 {loading ? <LoadingButton /> : <TouchableOpacity style={styles.payBtn} onPress={handlePayment} disabled={loading} >
                     <Text style={styles.payBtnText}>  Pay ₹ {bookingData?.totalPrice} </Text>
                 </TouchableOpacity>}
             </ScrollView>
-        </SafeAreaView>
+
+            <VerifyingPaymentModal visible={verifyVisible} onClose={() => setVerifyVisible(false)} />
+            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} />
+
+        </View>
     );
 };
 
@@ -138,7 +179,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#F5F5F5",
-        padding: 16,
     },
 
     header: {

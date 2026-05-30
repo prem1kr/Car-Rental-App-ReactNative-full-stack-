@@ -16,9 +16,9 @@ const Profile = () => {
   const user = useSelector(state => state.user.user || {});
   const userName = user?.name;
   const dispatch = useDispatch();
-  const reviews = useSelector(state => state.review.review || []);
-  const rating = reviews.reduce((sum, item) => sum + item.rating, 0);
-  const averageRating = rating / reviews.length;
+  const reviews = useSelector(state => Array.isArray(state.review.review) ? state.review.review : []); const rating = reviews.reduce((sum, item) => sum + item.rating, 0);
+  const ratings = reviews.reduce((sum, item) => sum + item.rating, 0);
+  const averageRating = reviews.length > 0 ? (ratings / reviews.length).toFixed(1) : 0;
 
   const handleLogout = async () => {
     try {

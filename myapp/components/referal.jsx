@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { applyReferal } from '../hooks/useReferal';
 import LoadingButton from './loadingButton';

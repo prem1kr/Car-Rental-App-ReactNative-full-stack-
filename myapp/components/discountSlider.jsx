@@ -61,16 +61,9 @@ const DiscountSlider = () => {
             <Text style={styles.heading}>Offers for You</Text>
 
             <FlatList ref={flatListRef} data={discounts} keyExtractor={(item) => item.id}
-                contentContainerStyle={{ paddingLeft: 12 }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToInterval={CARD_WIDTH}
-                decelerationRate="fast"
-
+                contentContainerStyle={{ paddingLeft: 12 }} horizontal showsHorizontalScrollIndicator={false} snapToInterval={CARD_WIDTH} decelerationRate="fast"
                 onMomentumScrollEnd={(e) => {
-                    const index = Math.round(
-                        e.nativeEvent.contentOffset.x / CARD_WIDTH
-                    );
+                    const index = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
                     setActiveIndex(index);
                     indexRef.current = index;
                 }}

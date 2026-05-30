@@ -11,12 +11,7 @@ const EditCarModal = ({ visible, onClose, onSave, car }) => {
     const handleSave = async () => {
         try {
             setLoading(true);
-            const updatedData = {
-                carName,
-                brand,
-                price
-            };
-
+            const updatedData = { carName, brand, price };
             onSave(updatedData);
         } catch (error) {
             console.log(error);

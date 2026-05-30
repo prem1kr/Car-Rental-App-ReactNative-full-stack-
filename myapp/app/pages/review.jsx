@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import { addReviews, deleteReview, getUserReviews } from '../../hooks/useReview';
 import { useDispatch, useSelector } from 'react-redux';
-import { setDelteReview, setReview } from '../../features/reviewSlice';
+import { setDelteReview, setReview, setReviewRedux } from '../../features/reviewSlice';
 import LoadingButton from '../../components/loadingButton';
 
 const ReviewScreen = () => {
@@ -29,7 +29,7 @@ const ReviewScreen = () => {
 
             const response = await addReviews(reviewData);
             if (response?.success) {
-                dispatch(setReview(response.review));
+                dispatch(setReviewRedux(response.review));
                 setComment('');
                 setRating(0);
                 Alert.alert("reviewed succssfully");
@@ -77,18 +77,18 @@ const ReviewScreen = () => {
                 <View style={styles.userInfo}>
 
                     <View style={styles.avatar}>
-                        <Text style={styles.avatarText}> {item?.userName?.charAt(0).toUpperCase()} </Text>
+                        <Text style={styles.avatarText}>{item?.userName?.charAt(0).toUpperCase()}</Text>
                     </View>
 
                     <View>
-                        <Text style={styles.name}>  {item.userName} </Text>
-                        <Text style={styles.carName}> {item?.carId?.carName} • {item?.carId?.brand} </Text>
+                        <Text style={styles.name}>{item.userName}</Text>
+                        <Text style={styles.carName}>{item?.carId?.carName} • {item?.carId?.brand}</Text>
                     </View>
 
                 </View>
 
                 <View style={styles.rightSection}>
-                    <View style={styles.ratingBox}>  {renderStars(item.rating)} </View>
+                    <View style={styles.ratingBox}>{renderStars(item.rating)}</View>
                     <View style={styles.actions}>
                         <TouchableOpacity onPress={() => handleDelete(item._id)}>
                             <Ionicons name="trash-outline" size={20} color="#e53935" />
@@ -97,11 +97,11 @@ const ReviewScreen = () => {
                 </View>
             </View>
 
-            <Text style={styles.comment}>{item.comment} </Text>
+            <Text style={styles.comment}>{item.comment}</Text>
 
             <View style={styles.bottomRow}>
                 <Ionicons name="time-outline" size={14} color="#888" />
-                <Text style={styles.time}> {new Date(item?.createdAt).toLocaleString()} </Text>
+                <Text style={styles.time}>{new Date(item?.createdAt).toLocaleString()}</Text>
             </View>
 
         </View>
@@ -133,7 +133,7 @@ const ReviewScreen = () => {
                             </View>
 
                             <TextInput placeholder="Write your experience..." value={comment} onChangeText={setComment} style={styles.input} multiline />
-                            
+
                             {loading ? <LoadingButton /> : <TouchableOpacity style={styles.button} onPress={addReview}>
                                 <Text style={styles.buttonText}>Submit Review</Text>
                             </TouchableOpacity>

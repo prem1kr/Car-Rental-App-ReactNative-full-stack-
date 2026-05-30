@@ -7,7 +7,7 @@ import { createBooking } from '../hooks/useBooking';
 import { setBookingRedux } from '../features/bookingSlice';
 import { useRouter } from 'expo-router';
 import LoadingButton from './loadingButton';
-// import MapLocationPicker from './MapLocationPicker';
+import MapLocationPicker from './MapLocationPicker';
 
 const BookingModal = ({ visible, onClose, car, userId }) => {
     const router = useRouter();
@@ -58,7 +58,6 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
             const response = await createBooking(bookingData);
             if (response?.success) {
                 dispatch(setBookingRedux(response.booking));
-                Alert.alert('Success', response?.message);
                 setPickupDate(null);
                 setReturnDate(null);
                 setPickupLocation('');
@@ -101,11 +100,21 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                     </View>
                                 </View>
 
-                                <TouchableOpacity style={styles.inputContainer} onPress={() => setShowPickupPicker(true)} >
+                                <TouchableOpacity style={styles.inputContainer} onPress={() => {
+                                    if (Platform.OS !== "web") {
+                                        setShowPickupPicker(true);
+                                    }
+                                }}>
                                     <Ionicons name="calendar-outline" size={20} color="#2563EB" />
-                                    <Text style={[styles.inputText, { color: pickupDate ? '#111827' : '#9CA3AF' }]}>
-                                        {pickupDate ? formatDate(pickupDate) : 'Pickup Date'}
-                                    </Text>
+                                    {Platform.OS === "web" ? (
+                                        <input type="date" value={pickupDate ? pickupDate.toISOString().split("T")[0] : ""}
+                                            onChange={(e) => { setPickupDate(new Date(e.target.value)); }}
+                                            style={{ border: "none", outline: "none", width: "100%", fontSize: 15, background: "transparent" }} />
+                                    ) : (
+                                        <Text style={[styles.inputText, { color: pickupDate ? "#111827" : "#9CA3AF" }]}>
+                                            {pickupDate ? formatDate(pickupDate) : "Pickup Date"}
+                                        </Text>
+                                    )}
                                 </TouchableOpacity>
 
                                 {showPickupPicker && (
@@ -118,11 +127,23 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                         }} />
                                 )}
 
-                                <TouchableOpacity style={styles.inputContainer} onPress={() => setShowReturnPicker(true)} >
+                                <TouchableOpacity style={styles.inputContainer} onPress={() => {
+                                    if (Platform.OS !== "web") {
+                                        setShowReturnPicker(true);
+                                    }
+                                }}>
+
                                     <Ionicons name="calendar-clear-outline" size={20} color="#2563EB" />
-                                    <Text style={[styles.inputText, { color: returnDate ? '#111827' : '#9CA3AF' }]} >
-                                        {returnDate ? formatDate(returnDate) : 'Return Date'}
-                                    </Text>
+                                    {Platform.OS === "web" ? (
+                                        <input type="date" value={returnDate ? returnDate.toISOString().split("T")[0] : ""}
+                                            min={pickupDate ? pickupDate.toISOString().split("T")[0] : new Date().toISOString().split("T")[0]}
+                                            onChange={(e) => { setReturnDate(new Date(e.target.value)); }}
+                                            style={{ border: "none", outline: "none", width: "100%", fontSize: 15, background: "transparent" }} />
+                                    ) : (
+                                        <Text style={[styles.inputText, { color: returnDate ? "#111827" : "#9CA3AF" }]}>
+                                            {returnDate ? formatDate(returnDate) : "Return Date"}
+                                        </Text>
+                                    )}
                                 </TouchableOpacity>
 
                                 {showReturnPicker && (
@@ -182,8 +203,7 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                 </View>
             </Modal>
 
-
-            {/* <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
+            <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
                 onSelectLocation={({ latitude, longitude }) => {
                     const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
                     if (selectingType === 'pickup') {
@@ -192,8 +212,7 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                         setDropLocation(address);
                     }
                     setLocationModal(false);
-                }}
-            /> */}
+                }} />
 
         </>
     );

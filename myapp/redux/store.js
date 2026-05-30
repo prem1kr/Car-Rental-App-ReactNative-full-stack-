@@ -13,6 +13,7 @@ import paymentReducer from "@/features/paymentCardSlice";
 import reviewReducer from "@/features/reviewSlice";
 import referalReducer from "@/features/referalSlice";
 import searchReducer from "@/features/searchSlice";
+import paymentsReducer from "@/features/paymentSlice";
 
 export const store = configureStore({
     reducer: {
@@ -30,6 +31,7 @@ export const store = configureStore({
         review: reviewReducer,
         referal: referalReducer,
         search: searchReducer,
+        payments: paymentsReducer,
     }
 });
 

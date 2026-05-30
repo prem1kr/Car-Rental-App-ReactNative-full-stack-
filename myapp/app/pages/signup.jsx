@@ -30,7 +30,6 @@ const Signup = () => {
                 }
             );
             if (res.data.success) {
-                console.log("Signup Response:", res.data);
                 await AsyncStorage.setItem("userId", res.data.user.id);
                 Alert.alert("Success", "Signup successful");
                 setOpenPopup(true);
@@ -58,7 +57,6 @@ const Signup = () => {
                                 <TouchableOpacity style={[styles.roleBtn, role === 'user' && styles.activeRole]} onPress={() => setRole('user')} >
                                     <Text style={[styles.roleText, role === 'user' && styles.activeText]}>User</Text>
                                 </TouchableOpacity>
-
                                 <TouchableOpacity style={[styles.roleBtn, role === 'admin' && styles.activeRole]} onPress={() => setRole('admin')} >
                                     <Text style={[styles.roleText, role === 'admin' && styles.activeText]}>Admin</Text>
                                 </TouchableOpacity>
@@ -67,17 +65,10 @@ const Signup = () => {
                             <TextInput placeholder="Full Name" placeholderTextColor="#aaa" style={styles.input} value={name} onChangeText={setName} />
                             <TextInput placeholder="Email" placeholderTextColor="#aaa" style={styles.input} value={email} onChangeText={setEmail} />
                             <TextInput placeholder="Password" placeholderTextColor="#aaa" style={styles.input} secureTextEntry value={password} onChangeText={setPassword} />
-
-                            {/* <TouchableOpacity style={styles.signupBtn} onPress={handleSignup}>
-                        <Text style={styles.signupText}>Sign Up as {role}</Text>
-                    </TouchableOpacity> */}
-
                             <LoadingButton title={`Signup as ${role}`} onPress={handleSignup} loading={loading} style={styles.signupBtn} />
 
                             <Pressable onPress={() => router.push('/pages/login')} >
-                                <Text style={styles.switchText}> Already have an account?
-                                    <Text style={styles.link}> Login</Text>
-                                </Text>
+                                <Text style={styles.switchText}> Already have an account? <Text style={styles.link}> Login</Text> </Text>
                             </Pressable>
 
                         </View>

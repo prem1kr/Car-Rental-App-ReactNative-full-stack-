@@ -16,9 +16,9 @@ const Profile = () => {
   const userName = user?.name;
   const userId = user?.id;
   const dispatch = useDispatch();
-  const reviews = useSelector(state => state.review.review || []);
+  const reviews = useSelector(state => Array.isArray(state.review.review) ? state.review.review : []);
   const rating = reviews.reduce((sum, item) => sum + item.rating, 0);
-  const averateRating = rating / reviews.length;
+  const averageRating = reviews.length > 0 ? (rating / reviews.length).toFixed(1) : 0;
 
   const handleLogout = async () => {
     await Logout();
@@ -49,7 +49,7 @@ const Profile = () => {
           </View>
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>⭐ {averateRating}</Text>
+            <Text style={styles.badgeText}>⭐ {averageRating}</Text>
           </View>
         </LinearGradient>
 

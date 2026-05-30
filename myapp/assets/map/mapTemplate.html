@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .searchBox {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            right: 10px;
+            z-index: 999;
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background: #1F8A70;
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="searchBox">
+        <input id="search" placeholder="Search location..." />
+    </div>
+
+    <div id="map"></div>
+
+    <button class="btn" onclick="getCurrentLocation()">📍</button>
+
+    <script>
+        const map = L.map('map').setView([28.6139, 77.2090], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OSM'
+        }).addTo(map);
+
+        let marker;
+
+        function sendData(lat, lng, address = "") {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                latitude: lat,
+                longitude: lng,
+                address: address
+            }));
+        }
+
+        function setMarker(lat, lng) {
+            if (marker) map.removeLayer(marker);
+
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function () {
+                const pos = marker.getLatLng();
+                reverseGeocode(pos.lat, pos.lng);
+            });
+
+            reverseGeocode(lat, lng);
+        }
+
+        map.on('click', function (e) {
+            setMarker(e.latlng.lat, e.latlng.lng);
+        });
+
+        async function reverseGeocode(lat, lng) {
+            const res = await fetch(
+                "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng
+            );
+
+            const data = await res.json();
+            sendData(lat, lng, data.display_name || "");
+        }
+
+        let timeout;
+        document.getElementById("search").addEventListener("input", function (e) {
+            clearTimeout(timeout);
+
+            timeout = setTimeout(async () => {
+                const query = e.target.value;
+
+                if (query.length < 3) return;
+
+                const res = await fetch(
+                    "https://nominatim.openstreetmap.org/search?format=json&q=" + query
+                );
+
+                const data = await res.json();
+
+                if (data.length > 0) {
+                    const loc = data[0];
+                    map.setView([loc.lat, loc.lon], 15);
+                    setMarker(parseFloat(loc.lat), parseFloat(loc.lon));
+                }
+            }, 600);
+        });
+
+        function getCurrentLocation() {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                map.setView([lat, lng], 15);
+                setMarker(lat, lng);
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>

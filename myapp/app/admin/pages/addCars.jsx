@@ -30,15 +30,9 @@ const AddCars = () => {
             return;
         }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            allowsMultipleSelection: true,
-            quality: 1,
-        });
+        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, quality: 1 });
         if (!result.canceled) {
-            const selectedImages = result.assets.map(
-                (item) => item.uri
-            );
+            const selectedImages = result.assets.map((item) => item.uri);
             setImages([...images, ...selectedImages]);
         }
     };
@@ -63,9 +57,7 @@ const AddCars = () => {
             const uploadedImages = [];
 
             for (let i = 0; i < images.length; i++) {
-
                 const uploadedUrl = await uploadImageToCloudinary(images[i]);
-
                 if (uploadedUrl) {
                     uploadedImages.push(uploadedUrl);
                 }
@@ -85,9 +77,7 @@ const AddCars = () => {
             });
 
             dispatch(setCarsRedux(response.car));
-
             Alert.alert('Success', 'Car Added Successfully');
-
             setCarName('');
             setBrand('');
             setCarNumber('');
@@ -98,11 +88,7 @@ const AddCars = () => {
 
         } catch (error) {
             console.log(error);
-
-            Alert.alert(
-                'Error',
-                error?.response?.data?.message || 'Something went wrong'
-            );
+            Alert.alert( 'Error', error?.response?.data?.message || 'Something went wrong' );
         } finally {
             setLoading(false)
         }
