@@ -38,7 +38,7 @@ export const MarkedRead = async (req, res) => {
 
         const notification = await notificationModel.findByIdAndUpdate(id,
             { read: true }, { new: true }
-        );
+        ).populate('userId');
         if (!notification) {
             return res.status(404).json({ success: false, message: 'Notification not found' });
         }

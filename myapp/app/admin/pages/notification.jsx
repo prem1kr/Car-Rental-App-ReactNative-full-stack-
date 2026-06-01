@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { AddNotification, GetNotification } from '../../../hooks/useNotification';
+import { useRouter } from 'expo-router';
+import { AddNotification, GetNotification, removeNotification } from '../../../hooks/useNotification';
 import { useDispatch, useSelector } from 'react-redux';
-import { addNotificationRedux, setNotification } from '../../../features/notificationSlice';
+import { addNotificationRedux, deleteNotification, setNotification } from '../../../features/notificationSlice';
 import LoadingButton from '../../../components/loadingButton';
 
 const AdminNotification = () => {
@@ -44,20 +44,24 @@ const AdminNotification = () => {
         }
     }
 
+    const fetchNotification = async () => {
+        if (notification.length === 0) {
+            await GetNotification();
+        }
+    };
+
+    const handleDeleteNotification = async (item) => {
+        dispatch(deleteNotification(item?._id));
+        const response = await removeNotification(item?._id);
+        if(response.success){
+            Alert.alert(response.message);
+        }
+    }
+
     useEffect(() => {
         handlegetNotification();
+        fetchNotification();
     }, []);
-
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchNotification = async () => {
-                if (notification.length === 0) {
-                    await GetNotification();
-                }
-            };
-            fetchNotification();
-        }, [notification])
-    );
 
     return (
         <View style={styles.container}>
@@ -109,6 +113,10 @@ const AdminNotification = () => {
                                         </View>
 
                                         {!item?.read && (<View style={styles.dot} />)}
+
+                                        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteNotification(item)}>
+                                            <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                        </TouchableOpacity>
 
                                     </TouchableOpacity>
                                 ))
@@ -293,6 +301,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#2563EB',
         marginTop: 6,
+        right: 20,
     },
 
     emptyContainer: {
@@ -305,5 +314,15 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: '#999',
         fontSize: 15,
+    },
+
+    deleteButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 20,
+        backgroundColor: '#FEE2E2',
+
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

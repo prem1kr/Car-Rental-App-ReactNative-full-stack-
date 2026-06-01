@@ -1,3 +1,4 @@
+import { asyncThunkCreator } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = 'https://car-rental-app-backend-wxdr.onrender.com/api/notification';
@@ -30,6 +31,15 @@ export const MarkReadNotification = async (id) => {
 
     } catch (error) {
         console.log(error);
-        return { success: false };
     }
 };
+
+
+export const removeNotification = async (id) => {
+    try{
+        const response = await axios.delete(`${API_URL}/notification-delete/${id}`);
+        return response.data;
+    }catch(error){
+        return error.response.data;
+    }
+} 

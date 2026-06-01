@@ -44,7 +44,7 @@ const ReviewScreen = () => {
     const handleDelete = async (id) => {
         const response = await deleteReview(id);
         if (response.success) {
-            dispatch(setDelteReview(id));
+            dispatch(setDeleteReview(id));
             Alert.alert("review deleted successfully");
         }
     }

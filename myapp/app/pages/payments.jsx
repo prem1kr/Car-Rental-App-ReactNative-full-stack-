@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPayments } from "../../features/paymentSlice";
 import VerifyingPaymentModal from "../../components/paymentVerifying";
 import PaymentSuccessModal from "../../components/paymentSuccessfull";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { referalDetails } from "../../hooks/useReferal";
+import { setReferal } from "../../features/referalSlice";
 
 const PaymentScreen = () => {
     const router = useRouter();
@@ -23,6 +26,10 @@ const PaymentScreen = () => {
     const [offerCode, setOfferCode] = useState("");
     const [appliedOffer, setAppliedOffer] = useState(null);
     const [discountAmount, setDiscountAmount] = useState(0);
+    const [rewardAmount, setRewardAmount] = useState(0);
+    const [rewardApplied, setRewardApplied] = useState(false);
+    const user = useSelector(state => state.user.user || {});
+    const referal = useSelector(state => state.referal.referal || []);
 
     // discount
     const getDiscountPercent = (discountString) => {
@@ -47,8 +54,22 @@ const PaymentScreen = () => {
         Alert.alert("Success", `${percent}% discount applied 🎉`);
     };
 
+    const appliedReward = () => {
+        const availableReward = referal?.totalEarning || 0;
+        if (availableReward <= 0) {
+            return Alert.alert("No Reward", "You don't have any reward balance");
+        }
+
+        const maxReward = finalPrice - rewardAmount;
+        const usableReward = Math.min(availableReward, maxReward);
+        setRewardAmount(usableReward);
+        setRewardApplied(true);
+        Alert.alert("Success", `₹${usableReward} reward applied successfully 🎉`);
+    };
+
+
     const originalPrice = bookingData?.totalPrice || 0;
-    const finalPrice = Math.max(originalPrice - discountAmount, 0);
+    const finalPrice = Math.max(originalPrice - discountAmount - rewardAmount, 0);
 
     const startPaymentFlow = () => {
         setVerifyVisible(true);
@@ -87,6 +108,23 @@ const PaymentScreen = () => {
             setLoading(false);
         }
     };
+
+    const fetchReferralData = async () => {
+        const userid = await AsyncStorage.getItem("userId");
+        const currentUserId = user?.id || userid || user?._id;
+        const response = await referalDetails(currentUserId);
+        if (response.success) {
+            dispatch(setReferal({
+                referralCode: response.referralCode,
+                totalEarning: response.totalEarning,
+                invites: response.invites
+            }));
+        }
+    };
+
+    useEffect(() => {
+        fetchReferralData();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -135,62 +173,68 @@ const PaymentScreen = () => {
                 </View>
 
                 {/* Payment Summary */}
+
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>Payment Summary</Text>
-
                     <View style={styles.row}>
                         <Text style={styles.label}>Total Amount</Text>
-
                         <View style={{ alignItems: "flex-end" }}>
-                            {discountAmount > 0 && (
-                                <Text style={{ textDecorationLine: "line-through", color: "#999" }}>
-                                    ₹ {originalPrice}
-                                </Text>
+                            {(discountAmount > 0 || rewardAmount > 0) && (
+                                <Text style={{ textDecorationLine: "line-through", color: "#999" }}> ₹ {originalPrice} </Text>
                             )}
-
-                            <Text style={styles.price}>
-                                ₹ {finalPrice}
-                            </Text>
+                            <Text style={styles.price}>₹ {finalPrice}</Text>
                         </View>
                     </View>
 
-                    {/* 🔥 OFFER SECTION */}
+                    {discountAmount > 0 && (
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Offer Discount</Text>
+                            <Text style={{ color: "green", fontWeight: "700" }}> - ₹ {discountAmount}</Text>
+                        </View>
+                    )}
+
+                    {rewardAmount > 0 && (
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Reward Discount</Text>
+                            <Text style={{ color: "green", fontWeight: "700" }}> - ₹ {rewardAmount}</Text>
+                        </View>
+                    )}
+
                     <View style={{ marginTop: 15 }}>
                         <Text style={styles.sectionTitle}>Apply Offer</Text>
 
                         <View style={{ flexDirection: "row", gap: 10 }}>
-                            <TextInput
-                                placeholder="Enter offer code"
-                                value={offerCode}
-                                onChangeText={setOfferCode}
-                                style={[styles.input, { flex: 1 }]}
-                                placeholderTextColor="#999"
-                            />
-
-                            <TouchableOpacity
-                                onPress={applyOffer}
-                                style={{
-                                    backgroundColor: "#1F8A70",
-                                    paddingHorizontal: 14,
-                                    justifyContent: "center",
-                                    borderRadius: 10,
-                                }}
-                            >
-                                <Text style={{ color: "#fff", fontWeight: "600" }}>
-                                    Apply
-                                </Text>
+                            <TextInput placeholder="Enter offer code" value={offerCode} onChangeText={setOfferCode} style={[styles.input, { flex: 1 }]} placeholderTextColor="#999" />
+                            <TouchableOpacity onPress={applyOffer} style={{ backgroundColor: "#1F8A70", paddingHorizontal: 14, justifyContent: "center", borderRadius: 10 }}>
+                                <Text style={{ color: "#fff", fontWeight: "600" }}>Apply </Text>
                             </TouchableOpacity>
                         </View>
 
                         {appliedOffer && (
-                            <Text style={{ marginTop: 8, color: "green", fontWeight: "600" }}>
-                                🎉 {appliedOffer.title} Applied
-                            </Text>
+                            <Text style={{ marginTop: 8, color: "green", fontWeight: "600" }}> 🎉 {appliedOffer.title} Applied</Text>
                         )}
                     </View>
+
+                    {referal?.invites?.length !== 0 && referal?.totalEarning !== 0 && <View style={{ marginTop: 15 }}>
+                        <Text style={styles.sectionTitle}>Apply Referal Reward</Text>
+
+                        <View style={{ flexDirection: "row", gap: 10 }}>
+                            <Text style={[styles.input, { flex: 1 }]} placeholderTextColor="#999" >₹ {referal.totalEarning || 0}</Text>
+                            <TouchableOpacity onPress={appliedReward} style={{ backgroundColor: "#1F8A70", paddingHorizontal: 14, justifyContent: "center", borderRadius: 10 }}>
+                                <Text style={{ color: "#fff", fontWeight: "600" }}>Apply </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {rewardApplied && (
+                            <Text style={{ marginTop: 8, color: "green", fontWeight: "600" }}>  🎉 ₹ {rewardAmount} reward applied </Text>
+                        )}
+                    </View>
+                    }
+
+
+
                 </View>
 
-                {/* Payment Method */}
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>Select Payment Method</Text>
 
@@ -213,25 +257,17 @@ const PaymentScreen = () => {
                 {paymentMethod !== "Cash" && (
                     <View style={styles.card}>
                         <Text style={styles.sectionTitle}>Transaction ID</Text>
-                        <TextInput  placeholder="Enter transaction ID" value={transactionId}  onChangeText={setTransactionId}  style={styles.input} placeholderTextColor="#999"/>
+                        <TextInput placeholder="Enter transaction ID" value={transactionId} onChangeText={setTransactionId} style={styles.input} placeholderTextColor="#999" />
                     </View>
                 )}
-{/* 
-                {loading ? (
-                    <LoadingButton />
-                ) : (
-                    <TouchableOpacity style={styles.payBtn}  onPress={handlePayment}>
-                        <Text style={styles.payBtnText}> Pay ₹ {finalPrice} </Text>
-                    </TouchableOpacity>
-                )} */}
 
-                <LoadingButton title={`Pay ₹ ${finalPrice}` } style={styles.payBtn} onPress={handlePayment} loading={loading} /> 
+                <LoadingButton title={`Pay ₹ ${finalPrice}`} style={styles.payBtn} onPress={handlePayment} loading={loading} />
 
             </ScrollView>
 
             {/* Modals */}
             <VerifyingPaymentModal visible={verifyVisible} onClose={() => setVerifyVisible(false)} />
-            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)}  transactionId={transactionId} amount={finalPrice} paymentMethod={paymentMethod} />
+            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} transactionId={transactionId} amount={finalPrice} paymentMethod={paymentMethod} />
         </View>
     );
 };

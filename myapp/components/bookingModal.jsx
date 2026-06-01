@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux';
@@ -153,20 +153,21 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                         }} />
                                 )}
 
-                                <TouchableOpacity style={styles.inputContainer} onPress={() => { setSelectingType('pickup'); setLocationModal(true); }} >
+                                <View style={styles.inputContainer}>
                                     <Ionicons name="location-outline" size={20} color="#2563EB" />
-                                    <Text style={[styles.inputText, { color: pickupLocation ? '#111827' : '#9CA3AF' }]}>
-                                        {pickupLocation || 'Select Pickup Location'}
-                                    </Text>
-                                </TouchableOpacity>
+                                    <TextInput style={styles.inputText} placeholder="Enter Pickup Location" placeholderTextColor="#9CA3AF" value={pickupLocation} onChangeText={setPickupLocation} />
+                                    <TouchableOpacity onPress={() => { setSelectingType('pickup'); setLocationModal(true); }} >
+                                        <Ionicons name="map-outline" size={24} color="#2563EB" />
+                                    </TouchableOpacity>
+                                </View>
 
-                                <TouchableOpacity style={styles.inputContainer} onPress={() => { setSelectingType('drop'); setLocationModal(true); }} >
+                                <View style={styles.inputContainer}>
                                     <Ionicons name="navigate-outline" size={20} color="#2563EB" />
-                                    <Text style={[styles.inputText, { color: dropLocation ? '#111827' : '#9CA3AF' }]} >
-                                        {dropLocation || 'Select Drop Location'}
-                                    </Text>
-
-                                </TouchableOpacity>
+                                    <TextInput style={styles.inputText} placeholder="Enter Drop Location" placeholderTextColor="#9CA3AF" value={dropLocation} onChangeText={setDropLocation} />
+                                    <TouchableOpacity onPress={() => { setSelectingType('drop'); setLocationModal(true); }} >
+                                        <Ionicons name="map-outline" size={24} color="#2563EB" />
+                                    </TouchableOpacity>
+                                </View>
 
                                 <Text style={styles.paymentTitle}> Payment Method </Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.paymentRow} >
@@ -300,6 +301,12 @@ const styles = StyleSheet.create({
         flex: 1,
         marginLeft: 12,
         fontSize: 15,
+        color: '#111827',
+    },
+
+    mapIcon: {
+        marginLeft: 10,
+        padding: 4,
     },
 
     paymentTitle: {

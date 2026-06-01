@@ -10,8 +10,8 @@ import { setReferal } from '../../features/referalSlice';
 const ReferEarn = () => {
     const dispatch = useDispatch();
     const router = useRouter();
-    const user = useSelector(state => state.user.user);
-    const referals = useSelector(state => state.referal.referal);
+    const user = useSelector(state => state.user.user || {});
+    const referals = useSelector(state => state.referal.referal || []);
     const invites = Array.isArray(referals?.invites) ? referals.invites : [];
     const referralCode = referals?.referralCode || "";
     const totalEarnings = referals?.totalEarning || 0;
