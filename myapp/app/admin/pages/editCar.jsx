@@ -101,11 +101,8 @@ const styles = StyleSheet.create({
     },
 
     saveButton: {
-        flex: 1,
-        height: 50,
-        backgroundColor: '#2563eb',
+         backgroundColor: '#4ec28d',
         borderRadius: 12,
-        justifyContent: 'center',
         alignItems: 'center',
     },
 

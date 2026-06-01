@@ -47,8 +47,8 @@ const ApplyReferralPopup = ({ visible, onClose, onSuccess }) => {
                         <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose} >
                             <Text style={styles.cancelText}> Cancel</Text>
                         </TouchableOpacity>
-                        
-                        <LoadingButton  title={'Apply'} loading={loading} style={[styles.button, styles.applyButton]} onPress={handleApplyReferral}/>
+
+                        <LoadingButton title={'Apply'} loading={loading} style={[styles.button, styles.applyButton]} onPress={handleApplyReferral} />
 
                     </View>
                 </View>
@@ -99,10 +99,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        width: '48%',
-        height: 50,
+        backgroundColor: '#4ec28d',
         borderRadius: 12,
-        justifyContent: 'center',
         alignItems: 'center',
     },
 
@@ -111,7 +109,9 @@ const styles = StyleSheet.create({
     },
 
     applyButton: {
-        backgroundColor: '#1e88e5',
+        backgroundColor: '#4ec28d',
+        borderRadius: 12,
+        alignItems: 'center',
     },
 
     cancelText: {

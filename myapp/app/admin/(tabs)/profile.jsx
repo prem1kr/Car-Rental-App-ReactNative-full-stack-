@@ -68,11 +68,11 @@ const Profile = () => {
           <Action icon="headset-outline" label="Support" onPress={() => { router.push('/pages/chat'); }} />
         </View>
 
-        <Section title="Rental Services">
+        {/* <Section title="Rental Services">
           <Item icon="car-sport-outline" title="Daily Rentals" subtitle="Affordable rides anytime" />
           <Item icon="time-outline" title="Hourly Rentals" subtitle="Pay per hour" />
           <Item icon="calendar-outline" title="Long Trips" subtitle="Best for vacations" />
-        </Section>
+        </Section> */}
 
         <Section title="Account Settings">
           <Item icon="person-outline" title="Edit Profile" onPress={() => router.push('/pages/profile-edit')} />

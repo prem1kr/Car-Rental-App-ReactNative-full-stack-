@@ -88,7 +88,7 @@ const AddCars = () => {
 
         } catch (error) {
             console.log(error);
-            Alert.alert( 'Error', error?.response?.data?.message || 'Something went wrong' );
+            Alert.alert('Error', error?.response?.data?.message || 'Something went wrong');
         } finally {
             setLoading(false)
         }
@@ -156,8 +156,8 @@ const AddCars = () => {
                             <TextInput placeholder="Price Per Day" placeholderTextColor="#9CA3AF" style={styles.input} keyboardType="numeric" value={price} onChangeText={setPrice} />
                         </View>
 
-                       
-                        <LoadingButton  loading={loading} onPress={handleAddCar} title={'Add Car'} style={styles.addButton} />
+
+                        <LoadingButton loading={loading} onPress={handleAddCar} title={'Add Car'} style={styles.addButton} />
 
                     </ScrollView>
                 </ScrollView>
@@ -277,10 +277,8 @@ const styles = StyleSheet.create({
     },
 
     addButton: {
-        height: 58,
-        backgroundColor: '#2563EB',
-        borderRadius: 18,
-        justifyContent: 'center',
+        backgroundColor: '#4ec28d',
+        borderRadius: 12,
         alignItems: 'center',
         flexDirection: 'row',
         marginTop: 10,

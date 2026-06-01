@@ -233,15 +233,9 @@ const styles = StyleSheet.create({
     },
 
     addButton: {
-        height: 56,
-        backgroundColor: '#2563EB',
-        borderRadius: 16,
-
-        justifyContent: 'center',
+         backgroundColor: '#4ec28d',
+        borderRadius: 12,
         alignItems: 'center',
-
-        flexDirection: 'row',
-        gap: 10,
     },
 
     buttonText: {

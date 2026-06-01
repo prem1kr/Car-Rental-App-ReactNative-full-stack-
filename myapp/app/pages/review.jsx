@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import { addReviews, deleteReview, getUserReviews } from '../../hooks/useReview';
 import { useDispatch, useSelector } from 'react-redux';
-import { setDelteReview, setReview, setReviewRedux } from '../../features/reviewSlice';
+import { DelteReview, setReview, setReviewRedux } from '../../features/reviewSlice';
 import LoadingButton from '../../components/loadingButton';
 
 const ReviewScreen = () => {
@@ -44,7 +44,7 @@ const ReviewScreen = () => {
     const handleDelete = async (id) => {
         const response = await deleteReview(id);
         if (response.success) {
-            dispatch(setDeleteReview(id));
+            dispatch(DelteReview(id));
             Alert.alert("review deleted successfully");
         }
     }
@@ -206,9 +206,8 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: '#007BFF',
-        padding: 12,
-        borderRadius: 10,
+        backgroundColor: '#4ec28d',
+        borderRadius: 12,
         alignItems: 'center',
     },
 

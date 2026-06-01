@@ -376,14 +376,9 @@ const styles = StyleSheet.create({
     },
 
     bookBtn: {
-        height: 58,
-        backgroundColor: '#2563EB',
-        borderRadius: 18,
-        marginHorizontal: 18,
-        justifyContent: 'center',
+        backgroundColor: '#4ec28d',
+        borderRadius: 12,
         alignItems: 'center',
-        flexDirection: 'row',
-        gap: 10,
     },
 
     bookBtnText: {

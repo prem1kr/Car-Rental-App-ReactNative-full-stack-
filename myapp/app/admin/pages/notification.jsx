@@ -53,7 +53,7 @@ const AdminNotification = () => {
     const handleDeleteNotification = async (item) => {
         dispatch(deleteNotification(item?._id));
         const response = await removeNotification(item?._id);
-        if(response.success){
+        if (response.success) {
             Alert.alert(response.message);
         }
     }
@@ -222,14 +222,9 @@ const styles = StyleSheet.create({
     },
 
     addButton: {
-        height: 55,
-        backgroundColor: '#2563EB',
-        borderRadius: 16,
-        marginTop: 20,
-        flexDirection: 'row',
+        backgroundColor: '#4ec28d',
+        borderRadius: 12,
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
     },
 
     buttonText: {
