@@ -68,11 +68,8 @@ const Chat = () => {
     await router.back();
   }
 
-  // RENDER CHAT
   const renderItem = ({ item }) => {
     const isMyMessage = item.sender === userName;
-
-
     return (
 
       <View style={[styles.messageWrapper, isMyMessage ? styles.myMessageWrapper : styles.otherMessageWrapper]}>
@@ -100,21 +97,20 @@ const Chat = () => {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}> {senderName || 'Chat Support'} </Text>
 
         <TouchableOpacity onPress={removeSender}>
           <Ionicons name="exit-outline" size={24} color="#fff" />
         </TouchableOpacity>
-
       </View>
 
-      {/* CHAT LIST */}
-      <FlatList ref={flatListRef} data={messages} keyExtractor={(item) => item.id} renderItem={renderItem}
-        contentContainerStyle={styles.chatContainer} showsVerticalScrollIndicator={false}
-        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })} />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}   keyboardVerticalOffset={10}>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+          {/* CHAT LIST */}
+          <FlatList ref={flatListRef} data={messages} keyExtractor={(item) => item.id} renderItem={renderItem}
+            contentContainerStyle={styles.chatContainer} showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}   keyboardShouldPersistTaps="handled" />
 
           {/* INPUT */}
           <View style={styles.inputContainer}>
@@ -123,8 +119,7 @@ const Chat = () => {
               <Ionicons name="send" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
-          
-        </ScrollView>
+
       </KeyboardAvoidingView>
     </View>
   );
@@ -218,19 +213,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
   },
 
-  inputContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: '#E5E7EB',
-  },
+inputContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  paddingHorizontal: 14,
+  paddingVertical: 10,
+  borderTopWidth: 1,
+  borderColor: '#E5E7EB',
+},
 
   input: {
     flex: 1,

@@ -78,17 +78,15 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
 
     return (
         <>
-            <Modal visible={visible} transparent={true} animationType="slide" statusBarTranslucent={true} >
-                <View style={styles.overlay}>
 
-                    <KeyboardAvoidingView style={{ flex: 1, width: '100%' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} >
+
+            <Modal visible={visible} transparent={true} animationType="slide" statusBarTranslucent={true} >
+                <KeyboardAvoidingView style={{ flex: 1, width: '100%' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} >
+                        <View style={styles.overlay}>
 
                             <View style={styles.modalContainer}>
-                                <View style={styles.header}>
-                                    <Text style={styles.headerTitle}> Car Booking </Text>
-                                </View>
-
+                                <View style={styles.header}> <Text style={styles.headerTitle}> Car Booking </Text> </View>
                                 <View style={styles.carCard}>
                                     <Ionicons name="car-sport-outline" size={30} color="#2563EB" />
                                     <View style={{ marginLeft: 12 }}>
@@ -186,15 +184,15 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                 </View>
 
                                 <LoadingButton title={'Confirm Booking'} style={styles.bookBtn} onPress={handleBooking} loading={loading} />
-
                                 <TouchableOpacity style={styles.cancelBtn} onPress={onClose} >
                                     <Text style={styles.cancelText}>  Cancel  </Text>
                                 </TouchableOpacity>
 
                             </View>
-                        </ScrollView>
-                    </KeyboardAvoidingView>
-                </View>
+
+                        </View>
+                    </ScrollView >
+                </KeyboardAvoidingView >
             </Modal>
 
             <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
