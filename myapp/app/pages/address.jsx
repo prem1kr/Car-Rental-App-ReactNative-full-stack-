@@ -33,7 +33,7 @@ const AddressPage = () => {
 
     const fetchAddresses = async () => {
         try {
-            const response = await getUserAddresses(user?.id);
+            const response = await getUserAddresses(user?.id || user?._id);
             if (response?.success) {
                 dispatch(setAddressesRedux(response.addresses));
             }
@@ -69,7 +69,7 @@ const AddressPage = () => {
                 }
             } else {
                 const data = {
-                    userId: user?.id,
+                    userId: user?.id || user?._id,
                     label: form.label,
                     address: form.address,
                     city: form.city,
@@ -114,12 +114,12 @@ const AddressPage = () => {
 
     const setDefault = async (addressId) => {
         try {
+            dispatch(setDefaultAddressRedux(addressId));
             const response = await setDefaultAddress(
                 user?.id,
                 addressId
             );
             if (response?.success) {
-                dispatch(setDefaultAddressRedux(addressId));
                 fetchAddresses();
                 Alert.alert('Success', 'Default Address Updated');
             }
@@ -182,10 +182,7 @@ const AddressPage = () => {
                             <TextInput placeholder="City" style={styles.input} value={form.city} onChangeText={(text) => handleChange('city', text)} />
                             <TextInput placeholder="State" style={styles.input} value={form.state} onChangeText={(text) => handleChange('state', text)} />
                             <TextInput placeholder="Pincode" style={styles.input} keyboardType="numeric" value={form.pincode} onChangeText={(text) => handleChange('pincode', text)} />
-
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-                                <Text style={styles.saveText}>Save Address</Text>
-                            </TouchableOpacity>}
+                            <LoadingButton title={'Save Address'} style={styles.saveBtn} onPress={handleSave} loading={loading} />
 
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
                                 <Text style={styles.cancel}>Cancel</Text>

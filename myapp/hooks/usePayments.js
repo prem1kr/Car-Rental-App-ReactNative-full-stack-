@@ -32,6 +32,17 @@ export const getSinglePayments = async (id) => {
     }
 }
 
+export const getSingleUSerPayments = async (userId) => {
+    try {
+        const response = await axios.get(`${API_URL}/user-payment/${userId}`);
+        return response.data;
+
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+
 export const updatePayments = async (id, data) => {
     try {
         const response = await axios.put(`${API_URL}/update-payments-status/${id}`, data);

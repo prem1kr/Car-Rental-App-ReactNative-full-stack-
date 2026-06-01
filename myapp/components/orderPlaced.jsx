@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import LoadingButton from "./loadingButton";
 
 const OrderPlacedSuccessModal = ({ visible, onTrackOrder, onClose }) => {
     const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -39,18 +40,18 @@ const OrderPlacedSuccessModal = ({ visible, onTrackOrder, onClose }) => {
 
                     <View style={styles.card}>
                         <View style={styles.row}>
-                            <Text style={styles.label}>  Order ID </Text>
-                            <Text style={styles.value}>  #ORD458726 </Text>
+                            <Text style={styles.label}>  Order Status </Text>
+                            <Text style={styles.value}>  Pending </Text>
                         </View>
 
                         <View style={styles.row}>
                             <Text style={styles.label}> Payment Status </Text>
-                            <Text style={styles.success}>  Paid </Text>
+                            <Text style={styles.success}>  Verifying </Text>
                         </View>
 
                         <View style={styles.row}>
-                            <Text style={styles.label}> Estimated Delivery</Text>
-                            <Text style={styles.value}>2 - 4 Days  </Text>
+                            <Text style={styles.label}> Estimated Confermation Time</Text>
+                            <Text style={styles.value}>2 - 3 Minitus  </Text>
                         </View>
                     </View>
 

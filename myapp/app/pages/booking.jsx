@@ -9,6 +9,7 @@ import { setBooking } from '../../features/bookingSlice';
 import { getUserReviews } from '../../hooks/useReview';
 import { setReview } from '../../features/reviewSlice';
 
+
 const BookingHistory = () => {
     const getStatusColor = (status) => {
         switch (status) {
@@ -25,6 +26,23 @@ const BookingHistory = () => {
                 return '#999';
         }
     };
+
+     const getPaymentStatusColor = (status) => {
+        switch (status) {
+            case 'Paid':
+                return '#4CAF50';
+
+            case 'Pending':
+                return '#FFA000';
+
+            case 'Failed':
+                return '#E53935';
+
+            default:
+                return '#999';
+        }
+    };
+
 
     const router = useRouter();
     const user = useSelector((state) => state.user.user || {});
@@ -64,6 +82,10 @@ const BookingHistory = () => {
                 <CarImageSlider photos={item?.carId?.images || item?.images || []} />
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                     <Text style={styles.statusText}>{item.status}</Text>
+                </View>
+
+                <View style={[styles.statusPayment, { backgroundColor: getPaymentStatusColor(item.paymentStatus) }]}>
+                    <Text style={styles.statusText}> ₹ . {item.paymentStatus}</Text>
                 </View>
 
                 <View style={styles.details}>
@@ -212,6 +234,22 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 20,
+    },
+    statusPayment: {
+        position: 'absolute',
+        top: 220, 
+        right: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 20,
+        minWidth: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 3,
+        elevation: 3,
     },
 
     statusText: {

@@ -44,7 +44,7 @@ const VerifyingPaymentModal = ({ visible, onClose }) => {
 
             <View style={styles.row}>
               <Text style={styles.label}> Estimated Time </Text>
-              <Text style={styles.value}>   5 - 10 seconds </Text>
+              <Text style={styles.value}>   20 - 60 seconds </Text>
             </View>
           </View>
 

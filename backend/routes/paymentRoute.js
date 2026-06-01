@@ -1,5 +1,5 @@
 import express from "express";
-import { createPaymentController, deletePaymentController, getAllPaymentsController, getSinglePaymentController, updatePaymentStatusController } from "../controllers/paymentController.js";
+import { createPaymentController, deletePaymentController, getAllPaymentsController, getSinglePaymentController, getUserPayment, updatePaymentStatusController } from "../controllers/paymentController.js";
 
 const paymentsRouter = express.Router();
 
@@ -8,5 +8,6 @@ paymentsRouter.get("/all-payments", getAllPaymentsController);
 paymentsRouter.get("/payments/:id", getSinglePaymentController);
 paymentsRouter.put("/update-payments-status/:id", updatePaymentStatusController);
 paymentsRouter.delete("/delete-payments/:id", deletePaymentController);
+paymentsRouter.get("/user-paymet/:userId", getUserPayment);
 
 export default paymentsRouter;

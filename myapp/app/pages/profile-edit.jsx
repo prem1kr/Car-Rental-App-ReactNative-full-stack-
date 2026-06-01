@@ -99,9 +99,8 @@ const EditProfile = () => {
                         <TextInput placeholder="License Expiry Date (DD/MM/YYYY)" style={styles.input} value={form.expiry} onChangeText={(text) => handleChange('expiry', text)} />
                         <Text style={styles.sectionTitle}>Emergency Contact</Text>
                         <TextInput placeholder="Emergency Contact Number" style={styles.input} keyboardType="phone-pad" value={form.contact} onChangeText={(text) => handleChange('contact', text)} />
-                        {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-                            <Text style={styles.saveText}>Save Changes</Text>
-                        </TouchableOpacity>}
+        
+                        <LoadingButton title={'Update Profile'} loading={loading} style={styles.saveBtn} onPress={handleSave} />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView >

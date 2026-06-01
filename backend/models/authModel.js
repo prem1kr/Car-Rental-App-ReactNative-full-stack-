@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const authSchema = new mongoose.Schema({
-    
+
     role: {
         type: String,
         enum: ["user", "admin"],
@@ -23,8 +23,7 @@ const authSchema = new mongoose.Schema({
     },
     referralCode: {
         type: String,
-        unique: true,
-        default:''
+        default:0,
     },
 
     totalReferralEarnings: {

@@ -1,37 +1,41 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-
-const payments = [
-  {
-    id: '1',
-    user: 'Prem Kumar',
-    amount: '₹4,500',
-    car: 'BMW X5',
-    date: '12 May 2026',
-    status: 'Success',
-  },
-  {
-    id: '2',
-    user: 'Rahul Sharma',
-    amount: '₹2,000',
-    car: 'Swift',
-    date: '10 May 2026',
-    status: 'Pending',
-  },
-  {
-    id: '3',
-    user: 'Ankit Verma',
-    amount: '₹6,800',
-    car: 'Audi A6',
-    date: '8 May 2026',
-    status: 'Success',
-  },
-];
+import { deletePayments, getAllPayments } from '../../../hooks/usePayments';
+import { useDispatch, useSelector } from 'react-redux';
+import { deletePayment, setPayments } from '../../../features/paymentSlice';
+import UpdatePaymentStatusModal from '../../../components/paymentStatusUpadate';
 
 const Payment = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const payments = useSelector(state => state.payments.payments || []);
+  const user = useSelector(state => state.user.user || {});
+  const userId = user?.id;
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+
+  const fetchPayments = async () => {
+    const response = await getAllPayments();
+    if (response.success) {
+      dispatch(setPayments(response.payments));
+      console.log(response.payments)
+    }
+  }
+
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+
+  const handleDelete = async (item) => {
+    dispatch(deletePayment(item._id));
+    const response = await deletePayments(item._id);
+    if (response.success) {
+      Alert.alert(response.message);
+    }
+  }
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -41,18 +45,45 @@ const Payment = () => {
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={styles.userName}>{item.user}</Text>
-          <Text style={styles.carName}>{item.car}</Text>
+          <Text style={styles.userName}>Transaction #{item.transactionId || []}</Text>
+          <Text style={styles.carName}> {item.paymentMethod}</Text>
         </View>
 
-        <Text style={[styles.status, item.status === 'Success' ? styles.success : styles.pending]}>{item.status}</Text>
+        <Text style={[styles.status, item.paymentStatus === "Paid" ? styles.success : styles.pending,]} >{item.paymentStatus} </Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>Booking ID</Text>
+        <Text style={styles.value}>{item.bookingId?._id}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>User Name</Text>
+        <Text style={styles.value}>{item?.userId?.name}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>User Email</Text>
+        <Text style={styles.value}>{item?.userId?.email}</Text>
       </View>
 
       <View style={styles.bottomRow}>
-        <Text style={styles.amount}>{item.amount}</Text>
-        <Text style={styles.date}>{item.date}</Text>
-      </View>
+        <View>
+          <Text style={styles.amount}>₹{item.amount}</Text>
+          <Text style={styles.date}> {new Date(item.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true })}</Text>
+        </View>
 
+        <View style={styles.actionRow}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => { setStatusModalVisible(true); setSelectedPayment(item); }} >
+            <Ionicons name="create-outline" size={20} color="#2563EB" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item)}>
+            <Ionicons name="trash-outline" size={20} color="#EF4444" />
+          </TouchableOpacity>
+        </View>
+
+      </View>
     </View>
   );
 
@@ -66,8 +97,8 @@ const Payment = () => {
         <Text style={styles.headerTitle}>Payment History</Text>
       </View>
 
-      <FlatList data={payments} keyExtractor={(item) => item.id} renderItem={renderItem} showsVerticalScrollIndicator={false} contentContainerStyle={styles.content} />
-
+      <FlatList data={payments} keyExtractor={(item) => item?._id} renderItem={renderItem} showsVerticalScrollIndicator={false} contentContainerStyle={styles.content} />
+      <UpdatePaymentStatusModal visible={statusModalVisible} onClose={() => setStatusModalVisible(false)} selectedPayment={selectedPayment} />
     </View>
   );
 };
@@ -170,4 +201,46 @@ const styles = StyleSheet.create({
   date: {
     color: '#9CA3AF',
   },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+
+  label: {
+    fontSize: 13,
+    color: "#6B7280",
+    fontWeight: "600",
+  },
+
+  value: {
+    flex: 1,
+    textAlign: "right",
+    color: "#111827",
+    fontSize: 13,
+  },
+
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  editBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#EEF4FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+
+  deleteBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#FEE2E2",
+    justifyContent: "center",
+    alignItems: "center",
+  }
 });

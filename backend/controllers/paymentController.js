@@ -19,12 +19,15 @@ export const createPaymentController = async (req, res) => {
             amount,
             paymentMethod,
             transactionId,
-            paymentStatus: "Paid",
+            paymentStatus:"Pending",
         });
 
-        booking.paymentStatus = "Paid";
+        booking.paymentStatus = "Pending";
         booking.paymentMethod = paymentMethod;
-        booking.status = "Confirmed";
+        booking.status = "Pending";
+        if (booking.totalPrice !== amount) {
+            booking.totalPrice = amount;
+        }
         await booking.save();
 
         res.status(201).send({ success: true, message: "Payment completed successfully", payment });
@@ -53,6 +56,22 @@ export const getAllPaymentsController = async (req, res) => {
 export const getSinglePaymentController = async (req, res) => {
     try {
         const payment = await paymentModel.findById(req.params.id).populate("userId").populate("bookingId");
+        if (!payment) {
+            return res.status(404).send({ success: false, message: "Payment not found" });
+        }
+
+        res.status(200).send({ success: true, payment });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({ success: false, message: "Error while getting payment", error });
+    }
+};
+
+export const getUserPayment = async (req, res) => {
+    try {
+        const {userId} = req.params;
+        const payment = await paymentsModel.find({ userId }).populate("bookingId").sort({createdAt:-1});
         if (!payment) {
             return res.status(404).send({ success: false, message: "Payment not found" });
         }

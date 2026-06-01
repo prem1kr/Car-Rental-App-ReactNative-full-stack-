@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import CarImageSlider from '../../../components/carImageSlider';
-import { getAllBookings, updateBookingStatus } from '../../../hooks/useBooking';
+import { deleteBooking, getAllBookings, updateBookingStatus } from '../../../hooks/useBooking';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBooking, updateBookingRedux } from '../../../features/bookingSlice';
+import { deleteBookingRedux, setBooking, updateBookingRedux } from '../../../features/bookingSlice';
 
 const BookingHistory = () => {
     const getStatusColor = (status) => {
@@ -56,11 +56,19 @@ const BookingHistory = () => {
         fetchBookings();
     }, []);
 
+    const handleDeleteBooking = async (item) => {
+        dispatch(deleteBookingRedux(item?._id));
+        const response = await deleteBooking(item?._id);
+        if (response.success) {
+            Alert.alert(response.message);
+        }
+    }
+
 
     const renderItem = ({ item }) => (
 
         <View style={styles.card}>
-            <CarImageSlider photos={item?.carId?.images || item?.images  || []} />
+            <CarImageSlider photos={item?.carId?.images || item?.images || []} />
 
             <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
                 <Text style={styles.statusText}>  {item.status} </Text>
@@ -73,11 +81,16 @@ const BookingHistory = () => {
                 <Text style={styles.location}> Pickup: {' '}{item.pickupLocation}</Text>
                 <Text style={styles.location}> Drop: {' '}{item.dropLocation}</Text>
 
+                <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDeleteBooking(item)}>
+                    <Ionicons name="trash-outline" size={20} color="#E53935" />
+                </TouchableOpacity>
+
                 <View style={styles.infoRow}>
                     <View style={styles.iconRow}>
                         <Ionicons name="calendar-outline" size={14} color="#666" />
                         <Text style={styles.date}> {new Date(item.pickupDate).toDateString()} {' '} - {' '} {new Date(item.returnDate).toDateString()} </Text>
                     </View>
+
 
                     <View style={styles.iconRow}>
                         <Ionicons name="cash-outline" size={14} color="#666" />
@@ -270,5 +283,18 @@ const styles = StyleSheet.create({
     emptyText: {
         marginTop: 10,
         color: '#999',
+    },
+    deleteIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 80,
+        backgroundColor: '#fff',
+        padding: 6,
+        borderRadius: 20,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 3,
     },
 });

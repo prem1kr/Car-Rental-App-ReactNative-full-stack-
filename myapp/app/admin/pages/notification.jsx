@@ -86,10 +86,7 @@ const AdminNotification = () => {
                                 <TextInput placeholder="Write notification message..." placeholderTextColor="#9CA3AF" multiline value={message} onChangeText={setMessage} style={styles.messageInput} />
                             </View>
 
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddNotification}>
-                                <Ionicons name="add-circle-outline" size={22} color="#fff" />
-                                <Text style={styles.buttonText}> Add Notification </Text>
-                            </TouchableOpacity>}
+                            <LoadingButton onPress={handleAddNotification} title={'Add Notification'} loading={loading} style={styles.addButton} />
 
                         </View>
 

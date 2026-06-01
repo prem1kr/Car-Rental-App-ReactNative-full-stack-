@@ -23,7 +23,7 @@ const PaymentMethod = () => {
         expiry: "",
         cvv: "",
     });
-
+    
     const fetchCards = async () => {
         try {
             const res = await getPaymentCards(user?.id);
@@ -46,7 +46,7 @@ const PaymentMethod = () => {
             console.log(error);
         }
     }
-
+ 
 
     const handleAddCard = async () => {
         if (!form.name || !form.number || !form.expiry || !form.cvv) {
@@ -56,7 +56,7 @@ const PaymentMethod = () => {
         try {
             setLoading(true);
             const data = {
-                userId: user?.id,
+                userId: user?._id,
                 name: form.name,
                 cardNumber: form.number,
                 expiry: form.expiry,
@@ -152,9 +152,8 @@ const PaymentMethod = () => {
                                 <TextInput placeholder="CVV" style={[styles.input, { flex: 1 }]} keyboardType="numeric" value={form.cvv} onChangeText={(text) => setForm({ ...form, cvv: text })} />
                             </View>
 
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveBtn} onPress={handleAddCard} >
-                                <Text style={styles.saveText}>  Save Card </Text>
-                            </TouchableOpacity>}
+                            <LoadingButton title={'Save Card'} style={styles.saveBtn} onPress={handleAddCard} loading={loading}/>
+
                         </View>
                     )}
                 </ScrollView>

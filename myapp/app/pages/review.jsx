@@ -133,11 +133,7 @@ const ReviewScreen = () => {
                             </View>
 
                             <TextInput placeholder="Write your experience..." value={comment} onChangeText={setComment} style={styles.input} multiline />
-
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.button} onPress={addReview}>
-                                <Text style={styles.buttonText}>Submit Review</Text>
-                            </TouchableOpacity>
-                            }
+                            <LoadingButton title={'Submit Review'} style={styles.button} onPress={addReview} loading={loading} />
 
                         </View>
 

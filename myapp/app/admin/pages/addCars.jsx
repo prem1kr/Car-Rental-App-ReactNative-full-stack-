@@ -156,10 +156,8 @@ const AddCars = () => {
                             <TextInput placeholder="Price Per Day" placeholderTextColor="#9CA3AF" style={styles.input} keyboardType="numeric" value={price} onChangeText={setPrice} />
                         </View>
 
-                        {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddCar}>
-                            <Ionicons name="add-circle-outline" size={22} color="#fff" />
-                            <Text style={styles.buttonText}> Add Car </Text>
-                        </TouchableOpacity>}
+                       
+                        <LoadingButton  loading={loading} onPress={handleAddCar} title={'Add Car'} style={styles.addButton} />
 
                     </ScrollView>
                 </ScrollView>

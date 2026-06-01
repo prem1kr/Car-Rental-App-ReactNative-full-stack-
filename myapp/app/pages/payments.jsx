@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { createPayments, getSinglePayments } from "../../hooks/usePayments";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { createPayments } from "../../hooks/usePayments";
 import LoadingButton from "../../components/loadingButton";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { setPayments } from "../../features/paymentSlice";
 import VerifyingPaymentModal from "../../components/paymentVerifying";
 import PaymentSuccessModal from "../../components/paymentSuccessfull";
@@ -14,13 +14,41 @@ const PaymentScreen = () => {
     const dispatch = useDispatch();
     const { booking } = useLocalSearchParams();
     const bookingData = JSON.parse(booking);
+    const offers = useSelector(state => state.offer.offer || []);
     const [paymentMethod, setPaymentMethod] = useState("UPI");
     const [transactionId, setTransactionId] = useState("");
     const [loading, setLoading] = useState(false);
     const [verifyVisible, setVerifyVisible] = useState(false);
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState(false);
-    // const [paymentId , setPaymentId] = useState();
+    const [offerCode, setOfferCode] = useState("");
+    const [appliedOffer, setAppliedOffer] = useState(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
 
+    // discount
+    const getDiscountPercent = (discountString) => {
+        if (!discountString) return 0;
+        const match = discountString.match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+    };
+
+    const applyOffer = () => {
+        const code = offerCode.trim().toUpperCase();
+        const offer = offers.find((o) => o.code?.toUpperCase() === code);
+        if (!offer) {
+            setAppliedOffer(null);
+            setDiscountAmount(0);
+            return Alert.alert("Invalid Code", "Offer not found");
+        }
+        const percent = getDiscountPercent(offer.discount);
+        const total = bookingData?.totalPrice || 0;
+        const discount = (total * percent) / 100;
+        setAppliedOffer(offer);
+        setDiscountAmount(discount);
+        Alert.alert("Success", `${percent}% discount applied 🎉`);
+    };
+
+    const originalPrice = bookingData?.totalPrice || 0;
+    const finalPrice = Math.max(originalPrice - discountAmount, 0);
 
     const startPaymentFlow = () => {
         setVerifyVisible(true);
@@ -39,54 +67,31 @@ const PaymentScreen = () => {
             const payload = {
                 bookingId: bookingData?._id,
                 userId: bookingData?.userId?.toString?.() || bookingData?.userId,
-                amount: bookingData?.totalPrice,
-                paymentMethod: bookingData?.paymentMethod,
+                amount: finalPrice,
+                paymentMethod,
                 transactionId,
             };
+
             const res = await createPayments(payload);
             if (res.success) {
-                // setPaymentId(res.payment._id);
                 dispatch(setPayments(res.payment));
                 startPaymentFlow();
             } else {
                 Alert.alert("Error", res.message);
             }
+
         } catch (error) {
-
-            console.log(
-                "FULL ERROR =>",
-                error?.response?.data || error.message
-            );
-
-            Alert.alert(
-                "Error",
-                error?.response?.data?.message || "Payment failed"
-            );
-
-
+            console.log("ERROR =>", error?.response?.data || error.message);
+            Alert.alert("Error", error?.response?.data?.message || "Payment failed");
         } finally {
             setLoading(false);
         }
     };
 
-    // const fetchPayment = async () => {
-    //     const response = await getSinglePayments(paymentId);
-    //     if (response.success) {
-    //         dispatch(setPayments(response.payment));
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (paymentId) {
-    //         fetchPayment();
-    //     }
-    // }, [paymentId]);
-
-
-
-
     return (
         <View style={styles.container}>
+
+            {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
@@ -95,79 +100,138 @@ const PaymentScreen = () => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
+
+                {/* Booking Details */}
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}> Booking Details </Text>
+                    <Text style={styles.sectionTitle}>Booking Details</Text>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}> Pickup Date </Text>
-                        <Text style={styles.value}> {new Date(bookingData?.pickupDate).toDateString()} </Text>
+                        <Text style={styles.label}>Pickup Date</Text>
+                        <Text style={styles.value}>
+                            {new Date(bookingData?.pickupDate).toDateString()}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}> Return Date </Text>
-                        <Text style={styles.value}> {new Date(bookingData?.returnDate).toDateString()}</Text>
+                        <Text style={styles.label}>Return Date</Text>
+                        <Text style={styles.value}>
+                            {new Date(bookingData?.returnDate).toDateString()}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}> Pickup Location </Text>
-                        <Text style={styles.value}>{bookingData?.pickupLocation} </Text>
+                        <Text style={styles.label}>Pickup Location</Text>
+                        <Text style={styles.value}>
+                            {bookingData?.pickupLocation}
+                        </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}> Drop Location</Text>
-                        <Text style={styles.value}> {bookingData?.dropLocation} </Text>
+                        <Text style={styles.label}>Drop Location</Text>
+                        <Text style={styles.value}>
+                            {bookingData?.dropLocation}
+                        </Text>
                     </View>
-
                 </View>
 
-
+                {/* Payment Summary */}
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}> Payment Summary </Text>
+                    <Text style={styles.sectionTitle}>Payment Summary</Text>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}>Total Amount </Text>
-                        <Text style={styles.price}> ₹ {bookingData?.totalPrice}</Text>
+                        <Text style={styles.label}>Total Amount</Text>
+
+                        <View style={{ alignItems: "flex-end" }}>
+                            {discountAmount > 0 && (
+                                <Text style={{ textDecorationLine: "line-through", color: "#999" }}>
+                                    ₹ {originalPrice}
+                                </Text>
+                            )}
+
+                            <Text style={styles.price}>
+                                ₹ {finalPrice}
+                            </Text>
+                        </View>
                     </View>
 
+                    {/* 🔥 OFFER SECTION */}
+                    <View style={{ marginTop: 15 }}>
+                        <Text style={styles.sectionTitle}>Apply Offer</Text>
+
+                        <View style={{ flexDirection: "row", gap: 10 }}>
+                            <TextInput
+                                placeholder="Enter offer code"
+                                value={offerCode}
+                                onChangeText={setOfferCode}
+                                style={[styles.input, { flex: 1 }]}
+                                placeholderTextColor="#999"
+                            />
+
+                            <TouchableOpacity
+                                onPress={applyOffer}
+                                style={{
+                                    backgroundColor: "#1F8A70",
+                                    paddingHorizontal: 14,
+                                    justifyContent: "center",
+                                    borderRadius: 10,
+                                }}
+                            >
+                                <Text style={{ color: "#fff", fontWeight: "600" }}>
+                                    Apply
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {appliedOffer && (
+                            <Text style={{ marginTop: 8, color: "green", fontWeight: "600" }}>
+                                🎉 {appliedOffer.title} Applied
+                            </Text>
+                        )}
+                    </View>
                 </View>
 
-
+                {/* Payment Method */}
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}> Select Payment Method </Text>
+                    <Text style={styles.sectionTitle}>Select Payment Method</Text>
+
                     <TouchableOpacity style={[styles.paymentOption, paymentMethod === "UPI" && styles.activePayment]} onPress={() => setPaymentMethod("UPI")} >
                         <Ionicons name="phone-portrait-outline" size={22} color="#1F8A70" />
-                        <Text style={styles.paymentText}> UPI </Text>
+                        <Text style={styles.paymentText}>UPI</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={[styles.paymentOption, paymentMethod === "Card" && styles.activePayment]} onPress={() => setPaymentMethod("Card")}>
                         <Ionicons name="card-outline" size={22} color="#1F8A70" />
-                        <Text style={styles.paymentText}> Card </Text>
+                        <Text style={styles.paymentText}>Card</Text>
                     </TouchableOpacity>
 
-
-                    <TouchableOpacity style={[styles.paymentOption, paymentMethod === "Cash" && styles.activePayment]} onPress={() => setPaymentMethod("Cash")} >
+                    <TouchableOpacity style={[styles.paymentOption, paymentMethod === "Cash" && styles.activePayment]} onPress={() => setPaymentMethod("Cash")}>
                         <Ionicons name="cash-outline" size={22} color="#1F8A70" />
-                        <Text style={styles.paymentText}> Cash</Text>
+                        <Text style={styles.paymentText}>Cash</Text>
                     </TouchableOpacity>
-
                 </View>
-
 
                 {paymentMethod !== "Cash" && (
                     <View style={styles.card}>
-                        <Text style={styles.sectionTitle}> Transaction ID </Text>
-                        <TextInput placeholder="Enter transaction ID" value={transactionId} onChangeText={setTransactionId} style={styles.input} placeholderTextColor="#999" />
+                        <Text style={styles.sectionTitle}>Transaction ID</Text>
+                        <TextInput  placeholder="Enter transaction ID" value={transactionId}  onChangeText={setTransactionId}  style={styles.input} placeholderTextColor="#999"/>
                     </View>
                 )}
+{/* 
+                {loading ? (
+                    <LoadingButton />
+                ) : (
+                    <TouchableOpacity style={styles.payBtn}  onPress={handlePayment}>
+                        <Text style={styles.payBtnText}> Pay ₹ {finalPrice} </Text>
+                    </TouchableOpacity>
+                )} */}
 
-                {loading ? <LoadingButton /> : <TouchableOpacity style={styles.payBtn} onPress={handlePayment} disabled={loading} >
-                    <Text style={styles.payBtnText}>  Pay ₹ {bookingData?.totalPrice} </Text>
-                </TouchableOpacity>}
+                <LoadingButton title={`Pay ₹ ${finalPrice}` } style={styles.payBtn} onPress={handlePayment} loading={loading} /> 
+
             </ScrollView>
 
+            {/* Modals */}
             <VerifyingPaymentModal visible={verifyVisible} onClose={() => setVerifyVisible(false)} />
-            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} />
-
+            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)}  transactionId={transactionId} amount={finalPrice} paymentMethod={paymentMethod} />
         </View>
     );
 };

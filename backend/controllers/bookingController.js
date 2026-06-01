@@ -73,31 +73,49 @@ export const updateBookingStatus = async (req, res) => {
             { status },
             { new: true }
         );
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
 
         if (status === "Completed") {
-            await carModel.findByIdAndUpdate(
-                booking.paymentStatus = "Paid",
-                booking.carId,
-                { available: true }
-            )
+            booking.paymentStatus = "Paid";
+            await carModel.findByIdAndUpdate(booking.carId,
+                { available: true },
+                { new: true }
+            );
+        }
+
+        if (status === "Cancelled") {
+            booking.paymentStatus = "Failed";
+            await carModel.findByIdAndUpdate(booking.carId,
+                { available: true },
+                { new: true }
+            );
+        }
+
+        if (status === "Pending") {
+            booking.paymentStatus = "Pending";
+            await carModel.findByIdAndUpdate(booking.carId,
+                { available: true },
+                { new: true }
+            );
         }
 
         if (status === "Confirmed") {
-            await carModel.findByIdAndUpdate(
-                booking.paymentStatus = "Paid",
-                booking.carId,
-                { available: false }
-            )
+            booking.paymentStatus = "Paid";
+            await carModel.findByIdAndUpdate(booking.carId,
+                { available: false },
+                { new: true }
+            );
         }
 
+        await booking.save();
         res.status(200).json({ success: true, message: "Booking status updated", booking });
-
     } catch (error) {
         console.log("Update Booking Error:", error);
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };
-
 
 export const cancelBooking = async (req, res) => {
     try {

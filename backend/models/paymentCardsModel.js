@@ -33,4 +33,4 @@ const paymentSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("Payment", paymentSchema);
+export default mongoose.model("PaymentCards", paymentSchema);

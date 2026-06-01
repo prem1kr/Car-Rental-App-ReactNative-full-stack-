@@ -64,10 +64,7 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                 setDropLocation('');
                 setPaymentMethod('Cash');
                 onClose();
-                router.push({
-                    pathname: "/pages/payments",
-                    params: { booking: JSON.stringify(response.booking) }
-                });
+                router.push({ pathname: "/pages/payments", params: { booking: JSON.stringify(response.booking) } });
             } else {
                 Alert.alert('Error', response?.message);
             }
@@ -171,7 +168,6 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
 
                                 </TouchableOpacity>
 
-                                {/* Payment */}
                                 <Text style={styles.paymentTitle}> Payment Method </Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.paymentRow} >
 
@@ -188,10 +184,7 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                     <Text style={styles.price}> ₹{car?.price} </Text>
                                 </View>
 
-                                {loading ? <LoadingButton /> : <TouchableOpacity style={styles.bookBtn} onPress={handleBooking} >
-                                    <Ionicons name="checkmark-circle-outline" size={22} color="#fff" />
-                                    <Text style={styles.bookBtnText}> Confirm Booking</Text>
-                                </TouchableOpacity>}
+                                <LoadingButton title={'Confirm Booking'} style={styles.bookBtn} onPress={handleBooking} loading={loading} />
 
                                 <TouchableOpacity style={styles.cancelBtn} onPress={onClose} >
                                     <Text style={styles.cancelText}>  Cancel  </Text>

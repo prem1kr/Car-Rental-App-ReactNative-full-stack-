@@ -9,6 +9,7 @@ import { setCars } from '@/features/productSlice';
 import { setUser } from '@/features/userSlice';
 import { carData } from '../hooks/fetchCars';
 import { userInfo } from '../hooks/useUser';
+import "leaflet/dist/leaflet.css";
 
 function AppInitializer() {
   const dispatch = useDispatch();

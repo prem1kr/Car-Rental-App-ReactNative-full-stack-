@@ -3,7 +3,7 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, Animated, Easing } fro
 import { Ionicons } from "@expo/vector-icons";
 import OrderPlacedSuccessModal from "./orderPlaced";
 
-const PaymentSuccessModal = ({ visible, onClose }) => {
+const PaymentSuccessModal = ({ visible, onClose,transactionId,amount,paymentMethod }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -40,17 +40,17 @@ const PaymentSuccessModal = ({ visible, onClose }) => {
             <View style={styles.card}>
               <View style={styles.row}>
                 <Text style={styles.label}> Transaction ID </Text>
-                <Text style={styles.value}>  #TXN458726 </Text>
+                <Text style={styles.value}>  {transactionId} </Text>
               </View>
 
               <View style={styles.row}>
                 <Text style={styles.label}> Amount </Text>
-                <Text style={styles.value}>  ₹2,500 </Text>
+                <Text style={styles.value}>  ₹ {amount} </Text>
               </View>
 
               <View style={styles.row}>
                 <Text style={styles.label}> Payment Method </Text>
-                <Text style={styles.value}> UPI  </Text>
+                <Text style={styles.value}> {paymentMethod}  </Text>
               </View>
             </View>
 

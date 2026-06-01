@@ -1,4 +1,4 @@
-import paymentModel from "../models/paymentCardsModel.js";
+import paymentCardsModel from "../models/paymentCardsModel.js";
 
 export const addPaymentCard = async (req, res) => {
     try {
@@ -7,7 +7,7 @@ export const addPaymentCard = async (req, res) => {
             return res.status(400).json({success: false,message: "All fields are required"});
         }
 
-        const payment = await paymentModel.create({
+        const payment = await paymentCardsModel.create({
             userId,
             name,
             cardNumber,
@@ -26,7 +26,7 @@ export const addPaymentCard = async (req, res) => {
 export const getPaymentCards = async (req, res) => {
     try {
         const { userId } = req.params;
-        const payments = await paymentModel.find({ userId });
+        const payments = await paymentCardsModel.find({ userId });
         res.status(200).json({success: true,payments});
 
     } catch (error) {
@@ -39,7 +39,7 @@ export const getPaymentCards = async (req, res) => {
 export const deletePaymentCard = async (req, res) => {
     try {
         const { cardId } = req.params;
-        await paymentModel.findByIdAndDelete(cardId);
+        await paymentCardsModel.findByIdAndDelete(cardId);
         res.status(200).json({success: true,message: "Card deleted successfully"});
 
     } catch (error) {

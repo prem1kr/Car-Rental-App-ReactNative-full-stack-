@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { getAllReview } from '../../../hooks/useReview';
+import { deleteReview, getAllReview } from '../../../hooks/useReview';
 import { useDispatch, useSelector } from 'react-redux';
-import { setReview } from '../../../features/reviewSlice';
+import { DelteReview, setReview } from '../../../features/reviewSlice';
 
 const Review = () => {
   const router = useRouter();
@@ -21,6 +21,14 @@ const Review = () => {
   useEffect(() => {
     fetchAllReview();
   }, []);
+
+  const handleDeleteBooking = async (item) => {
+    dispatch(DelteReview(item?._id));
+    const response = await deleteReview(item?._id);
+    if (response.success) {
+      Alert.alert(response.message);
+    }
+  }
 
 
   const renderStars = (rating) => {
@@ -53,7 +61,11 @@ const Review = () => {
 
       <Text style={styles.reviewText}> {item.comment} </Text>
 
-      {/* {/* <View style={styles.actionRow}>
+      <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDeleteBooking(item)}>
+        <Ionicons name="trash-outline" size={20} color="#E53935" />
+      </TouchableOpacity>
+
+      {/* <View style={styles.actionRow}>
         <TouchableOpacity style={styles.replyButton} >
           <Ionicons name="chatbubble-outline" size={18} color="#2563EB" />
           <Text style={styles.replyText}> Reply</Text>
@@ -62,7 +74,6 @@ const Review = () => {
           <Ionicons name="trash-outline" size={18} color="#EF4444" />
           <Text style={styles.deleteText}> Delete </Text>
         </TouchableOpacity> 
-
       </View> */}
 
     </View>
@@ -223,4 +234,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
+  deleteIcon: {
+    position: 'absolute',
+    right: 20,
+    top: 80,
+    backgroundColor: '#fff',
+    padding: 6,
+    borderRadius: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+  }
 });

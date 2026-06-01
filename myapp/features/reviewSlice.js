@@ -13,7 +13,7 @@ const reviewSlice = createSlice({
         setReviewRedux: (state, action) => {
             state.review.unshift(action.payload);
         },
-        setDelteReview: (state, action) => {
+        DelteReview: (state, action) => {
             state.review = state.review.filter(
                 review => review._id !== action.payload
             );
@@ -22,5 +22,5 @@ const reviewSlice = createSlice({
     }
 });
 
-export const { setReview, setReviewRedux, setDelteReview } = reviewSlice.actions;
+export const { setReview, setReviewRedux, DelteReview } = reviewSlice.actions;
 export default reviewSlice.reducer;

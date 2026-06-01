@@ -12,8 +12,14 @@ export const generateReferal = async (req, res) => {
         if (user.referralCode) {
             return res.status(200).json({ success: true, referralCode: user.referralCode });
         }
+        let code;
+        let exists = true;
 
-        const code = (user.name.substring(0, 4).toUpperCase() || "USER") + Math.floor(1000 + Math.random() * 9000);
+        while (exists) {
+            code = (user.name || "USER").substring(0, 4).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+            const already = await authModel.findOne({ referralCode: code });
+            if (!already) exists = false;
+        }
         user.referralCode = code;
         await user.save();
         return res.status(200).json({ success: true, referralCode: code });

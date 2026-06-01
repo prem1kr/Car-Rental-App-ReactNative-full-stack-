@@ -23,7 +23,6 @@ const Offers = () => {
             const response = await getOffers();
             if (response?.success) {
                 dispatch(setOffer(response.offers));
-                console.log(response.offers)
             }
         } catch (error) {
             console.log(error);

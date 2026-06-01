@@ -38,10 +38,8 @@ const EditCarModal = ({ visible, onClose, onSave, car }) => {
                             <TouchableOpacity style={styles.cancelButton} onPress={onClose} >
                                 <Text style={styles.buttonText}> Cancel </Text>
                             </TouchableOpacity>
-
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.saveButton} onPress={handleSave} >
-                                <Text style={styles.buttonText}> Save </Text>
-                            </TouchableOpacity>}
+                            
+                            <LoadingButton loading={loading} style={styles.saveButton} onPress={handleSave} title={'Save'} />
 
                         </View>
                     </ScrollView>

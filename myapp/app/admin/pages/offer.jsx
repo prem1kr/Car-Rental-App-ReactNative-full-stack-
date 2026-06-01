@@ -111,10 +111,7 @@ const AddOffer = () => {
                                 <TextInput placeholder="Validity Date" placeholderTextColor="#9CA3AF" style={styles.input} value={validity} onChangeText={setValidity} />
                             </View>
 
-                            {loading ? <LoadingButton /> : <TouchableOpacity style={styles.addButton} onPress={handleAddOffer}>
-                                <Ionicons name="add-circle-outline" size={22} color="#fff" />
-                                <Text style={styles.buttonText}> Add Offer </Text>
-                            </TouchableOpacity>}
+                            <LoadingButton  loading={loading} title={'Add Offer'} style={styles.addButton} onPress={handleAddOffer} />
 
                         </View>
 
