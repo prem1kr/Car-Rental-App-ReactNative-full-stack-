@@ -20,12 +20,18 @@ Admins can manage cars, users, bookings, analytics, and live customer chats thro
 - Real-Time Booking Updates
 - Booking History
 - User Profile Management
-- Refer & Earn System
 - Real-Time Chat Support
 - Current Location Access
 - Review & Rating system
-- Saved Addres & Payment Method System
 - Real time Notification & Offers Update System
+- Referral & Reward System
+- Referral Code Generation & Tracking
+- Offer & Coupon Management
+- Saved Addresses Management
+- Payment Method Selection
+- Booking Status Tracking
+- Real-Time Notifications
+- Reward Balance Redemption
 - Responsive & Modern UI
 
 
@@ -50,7 +56,14 @@ Admins can manage cars, users, bookings, analytics, and live customer chats thro
 - Car Management
 - User Management
 - Revenue Tracking
-- Live Chat Monitoring
+- Referral Management
+- Reward Tracking
+- Offer/Coupon Management
+- Payment Status Control
+- Booking Status Control
+- Customer Review Moderation
+- Notification Management
+- Live Chat Support
 - Real-Time Statistics
 
 ---
@@ -98,6 +111,7 @@ DriveNow uses Cloudinary for image storage and optimization.
 - Expo Image Picker
 - Expo Linear Gradient
 - Socket.IO Client
+- Vector Icons (React icons)
 
 ---
 
@@ -120,27 +134,51 @@ DriveNow uses Cloudinary for image storage and optimization.
 
 ```json
 {
-  "@expo/vector-icons": "^15.0.3",
-  "@react-native-async-storage/async-storage": "2.2.0",
-  "@react-native-clipboard/clipboard": "^1.16.3",
-  "@react-native-community/datetimepicker": "8.4.4",
-  "@react-navigation/bottom-tabs": "^7.4.0",
-  "@react-navigation/elements": "^2.6.3",
-  "@react-navigation/native": "^7.1.8",
-  "@reduxjs/toolkit": "^2.11.2",
-  "axios": "^1.16.0",
-  "expo": "~54.0.33",
-  "expo-image-picker": "^55.0.20",
-  "expo-linear-gradient": "~15.0.8",
-  "expo-location": "~19.0.8",
-  "expo-router": "~6.0.23",
-  "react": "19.1.0",
-  "react-native": "0.81.5",
-  "react-native-chart-kit": "^6.12.2",
-  "react-native-google-places-autocomplete": "^2.6.4",
-  "react-native-maps": "1.20.1",
-  "react-redux": "^9.2.0",
-  "socket.io-client": "^4.8.3"
+    "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-clipboard/clipboard": "^1.16.3",
+    "@react-native-community/datetimepicker": "8.4.4",
+    "@react-navigation/bottom-tabs": "^7.4.0",
+    "@react-navigation/elements": "^2.6.3",
+    "@react-navigation/native": "^7.1.8",
+    "@reduxjs/toolkit": "^2.11.2",
+    "@teovilla/react-native-web-maps": "^0.9.5",
+    "axios": "^1.16.0",
+    "expo": "~54.0.33",
+    "expo-clipboard": "~8.0.8",
+    "expo-constants": "~18.0.13",
+    "expo-font": "~14.0.11",
+    "expo-haptics": "~15.0.8",
+    "expo-image": "~3.0.11",
+    "expo-image-picker": "^55.0.20",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-linking": "~8.0.11",
+    "expo-location": "~19.0.8",
+    "expo-router": "~6.0.23",
+    "expo-splash-screen": "~31.0.13",
+    "expo-status-bar": "~3.0.9",
+    "expo-symbols": "~1.0.8",
+    "expo-system-ui": "~6.0.9",
+    "expo-web-browser": "~15.0.10",
+    "leaflet": "^1.9.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-leaflet": "^5.0.0",
+    "react-native": "0.81.5",
+    "react-native-chart-kit": "^6.12.2",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-google-places-autocomplete": "^2.6.4",
+    "react-native-maps": "1.20.1",
+    "react-native-razorpay": "^3.0.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "~0.21.0",
+    "react-native-webview": "^13.16.1",
+    "react-native-worklets": "0.5.1",
+    "react-redux": "^9.2.0",
+    "socket.io-client": "^4.8.3"
 }
 ````
 
@@ -150,14 +188,16 @@ DriveNow uses Cloudinary for image storage and optimization.
 
 ```json
 {
-  "bcryptjs": "^3.0.3",
-  "cors": "^2.8.6",
-  "dotenv": "^17.4.2",
-  "express": "^5.2.1",
-  "jsonwebtoken": "^9.0.3",
-  "mongoose": "^9.6.1",
-  "nodemailer": "^8.0.7",
-  "socket.io": "^4.8.3"
+   "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.1",
+    "nodemailer": "^8.0.7",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.8.3"
 }
 ```
 
@@ -334,15 +374,17 @@ Cloudinary is used for:
 
 # 🚀 Future Improvements
 
-* Online Payment Gateway
-* Push Notifications
+* Push Notifications (FCM)
 * AI-Based Car Recommendations
 * Live Vehicle Tracking
 * Multi-Language Support
 * Dark Mode
 * Voice Search
 * Booking Reminders
-* SMTP Auth
+* Driver Verification
+* Loyalty Membership Plans
+* Advanced Analytics Dashboard
+* Online Payment Gateway
 ---
 
 # 👨‍💻 Developer
