@@ -13,7 +13,7 @@ const ReviewScreen = () => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const user = useSelector(state => state.user.user || {});
-    const userId = user?.id;
+    const userId = user?.id || user?._id;
     const userName = user?.name;
     const { carId } = useLocalSearchParams();
     const [comment, setComment] = useState('');
@@ -30,6 +30,8 @@ const ReviewScreen = () => {
             const response = await addReviews(reviewData);
             if (response?.success) {
                 dispatch(setReviewRedux(response.review));
+                const res = await getUserReviews(userId);
+                dispatch(setReview(res.review));
                 setComment('');
                 setRating(0);
                 Alert.alert("reviewed succssfully");
