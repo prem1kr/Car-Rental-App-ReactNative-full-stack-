@@ -19,9 +19,9 @@ const ReferEarn = () => {
     const fetchReferralData = async () => {
         try {
             const userid = await AsyncStorage.getItem("userId");
-            const currentUserId = user?.id || userid;
+            const currentUserId = user?.id || userid || user?._id;
+            
             await generateReferal(currentUserId);
-
             const response = await referalDetails(currentUserId);
             if (response.success) {
                 dispatch(setReferal({

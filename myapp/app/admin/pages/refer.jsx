@@ -3,18 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, Alert }
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from "react-redux";
-import { getAllReferal } from '../../../hooks/useReferal';
-import { setReferal } from '../../../features/referalSlice';
+import { deleteReferal, getAllReferal } from '../../../hooks/useReferal';
+import { removeReferal, setReferal } from '../../../features/referalSlice';
 
 const ReferEarn = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const referralsData = useSelector(state => state.referal.referal);
+  const referralsData = useSelector(state => state.referal.referal || []);
   const referrals = Array.isArray(referralsData) ? referralsData : [];
   const totalEarning = referrals.reduce((total, item) => total + (item.rewardAmount || 0), 0);
   const totalReferal = referrals.length;
   const totalJoined = referrals.filter((item) => item.status === "Joined").length;
-
 
   const fetchReferralData = async () => {
     const response = await getAllReferal();
@@ -22,6 +21,14 @@ const ReferEarn = () => {
       dispatch(setReferal(response.referals))
     } else {
       console.log('error');
+    }
+  }
+
+  const handleDeleteReferal = async (item) => {
+   await dispatch(removeReferal(item?._id));
+    const response = await deleteReferal(item?._id);
+    if (response.success) {
+      Alert.alert(response.message);
     }
   }
 
@@ -33,35 +40,26 @@ const ReferEarn = () => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
 
-      {/* TOP */}
       <View style={styles.topRow}>
         <View style={styles.iconBox}>
           <Ionicons name="people-outline" size={22} color="#2563EB" />
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={styles.userName}>{item.referrer.name}</Text>
-          <Text style={styles.code}>Referral Code: {item.referrer.referralCode}</Text>
+          <Text style={styles.userName}>{item?.referrer?.name}</Text>
+          <Text style={styles.code}> R-Code: {item?.referrer?.referralCode} </Text>
+          <Text style={styles.label}>{item?.referredUser?.name}</Text>
+
         </View>
 
-        <Text style={[styles.status, item.status === 'Joined' ? styles.success : styles.pending]}>{item.status}</Text>
+        <Text style={[styles.status, item?.status === "Joined" ? styles.success : styles.pending]} >{item?.status} </Text>
 
+
+
+        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteReferal(item)}>
+          <Ionicons name="trash-outline" size={20} color="#EF4444" />
+        </TouchableOpacity>
       </View>
-
-      {/* BOTTOM */}
-      <View style={styles.bottomRow}>
-        <View>
-          <Text style={styles.label}>Earnings</Text>
-          <Text style={styles.amount}>₹{item.rewardAmount}</Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>to</Text>
-          <Text style={styles.date}> {item.referredUser.name}</Text>
-        </View>
-
-      </View>
-
     </View>
   );
 
@@ -126,7 +124,7 @@ const ReferEarn = () => {
 
         <View style={styles.listSection}>
           <Text style={styles.sectionTitle}> Referral History </Text>
-          <FlatList data={referrals} keyExtractor={(item) => item.id} renderItem={renderItem} scrollEnabled={false} />
+          <FlatList data={referrals} keyExtractor={(item) => item?.id || item?._id} renderItem={renderItem} scrollEnabled={false} />
         </View>
 
       </ScrollView>
@@ -342,5 +340,14 @@ const styles = StyleSheet.create({
   date: {
     marginTop: 6,
     color: '#6B7280',
+  },
+  deleteButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 20,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10
   },
 });

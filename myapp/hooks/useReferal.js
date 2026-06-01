@@ -42,3 +42,13 @@ export const getAllReferal = async () => {
         return error.response.data;
     }
 }
+
+
+export const deleteReferal = async (id) => {
+    try {
+        const response = await axios.delete(`${API_URL}/delete-referal/${id}`);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}

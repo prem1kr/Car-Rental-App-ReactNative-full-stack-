@@ -23,7 +23,7 @@ const authSchema = new mongoose.Schema({
     },
     referralCode: {
         type: String,
-        default:0,
+        default:"",
     },
 
     totalReferralEarnings: {

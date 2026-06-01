@@ -11,6 +11,7 @@ import PaymentSuccessModal from "../../components/paymentSuccessfull";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { referalDetails } from "../../hooks/useReferal";
 import { setReferal } from "../../features/referalSlice";
+import OrderPlacedSuccessModal from "../../components/orderPlaced";
 
 const PaymentScreen = () => {
     const router = useRouter();
@@ -28,6 +29,7 @@ const PaymentScreen = () => {
     const [discountAmount, setDiscountAmount] = useState(0);
     const [rewardAmount, setRewardAmount] = useState(0);
     const [rewardApplied, setRewardApplied] = useState(false);
+    const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
     const user = useSelector(state => state.user.user || {});
     const referal = useSelector(state => state.referal.referal || []);
 
@@ -96,9 +98,11 @@ const PaymentScreen = () => {
             const res = await createPayments(payload);
             if (res.success) {
                 dispatch(setPayments(res.payment));
-                startPaymentFlow();
-            } else {
-                Alert.alert("Error", res.message);
+                if (paymentMethod === "Cash") {
+                    setOrderSuccessVisible(true);
+                } else {
+                    startPaymentFlow();
+                }
             }
 
         } catch (error) {
@@ -268,6 +272,7 @@ const PaymentScreen = () => {
             {/* Modals */}
             <VerifyingPaymentModal visible={verifyVisible} onClose={() => setVerifyVisible(false)} />
             <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} transactionId={transactionId} amount={finalPrice} paymentMethod={paymentMethod} />
+            <OrderPlacedSuccessModal visible={orderSuccessVisible} onClose={() => setOrderSuccessVisible(false)}/>
         </View>
     );
 };

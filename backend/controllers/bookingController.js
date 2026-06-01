@@ -77,6 +77,7 @@ export const updateBookingStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: "Booking not found" });
         }
 
+
         if (status === "Completed") {
             booking.paymentStatus = "Paid";
             await carModel.findByIdAndUpdate(booking.carId,

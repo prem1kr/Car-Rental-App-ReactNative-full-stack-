@@ -16,9 +16,12 @@ const referalSlice = createSlice({
         },
         setReferalRedux: (state, action) => {
             state.referal.unshift(action.payload);
+        },
+        removeReferal : (state, action) => {
+            state.referal = state.referal.filter((item)=> item?._id !== action.payload);
         }
     }
 });
 
-export const { setReferal, setReferalRedux } = referalSlice.actions;
+export const { setReferal, setReferalRedux,removeReferal } = referalSlice.actions;
 export default referalSlice.reducer;
