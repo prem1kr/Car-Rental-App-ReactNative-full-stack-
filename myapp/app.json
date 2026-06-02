@@ -4,6 +4,7 @@
     "slug": "car-rental-app",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./assets/images/icon.png",
 
     "splash": {
@@ -13,17 +14,27 @@
     },
 
     "scheme": "myapp",
+
     "userInterfaceStyle": "automatic",
+
     "newArchEnabled": true,
 
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Allow Drive Now to access your location."
+      }
     },
 
     "android": {
+      "package": "com.premkr.myapp",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.premkr.myapp",
+
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
 
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
@@ -41,13 +52,6 @@
       "reactCompiler": true
     },
 
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "4b1125c7-8fba-428b-8386-9773faa40010"
-      }
-    },
-
     "plugins": [
       "@react-native-community/datetimepicker",
       [
@@ -57,6 +61,13 @@
         }
       ]
     ],
+
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4b1125c7-8fba-428b-8386-9773faa40010"
+      }
+    },
 
     "owner": "prem016kumar"
   }

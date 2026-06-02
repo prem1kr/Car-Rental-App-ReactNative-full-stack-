@@ -78,7 +78,14 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                         <View style={styles.overlay}>
 
                             <View style={styles.modalContainer}>
-                                <View style={styles.header}> <Text style={styles.headerTitle}> Car Booking </Text> </View>
+
+                                <View style={styles.header}>
+                                    <TouchableOpacity onPress={onClose}>
+                                        <Ionicons name="arrow-back" size={24} color="#000" />
+                                    </TouchableOpacity>
+                                    <Text style={styles.headerTitle}>Bookings</Text>
+                                </View>
+
                                 <View style={styles.carCard}>
                                     <Ionicons name="car-sport-outline" size={30} color="#2563EB" />
                                     <View style={{ marginLeft: 12 }}>
@@ -176,9 +183,6 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                                 </View>
 
                                 <LoadingButton title={'Confirm Booking'} style={styles.bookBtn} onPress={handleBooking} loading={loading} />
-                                <TouchableOpacity style={styles.cancelBtn} onPress={onClose} >
-                                    <Text style={styles.cancelText}>  Cancel  </Text>
-                                </TouchableOpacity>
 
                             </View>
 
@@ -221,19 +225,25 @@ const styles = StyleSheet.create({
     },
 
     modalContainer: {
+        width:'95%',
         backgroundColor: '#F5F7FB',
         borderRadius: 28,
         overflow: 'hidden',
+        paddingBottom:10
     },
 
     header: {
-        height: 85,
+        height: 50,
         backgroundColor: '#4ec28d',
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-        borderBottomRightRadius: 24,
-        borderTopLeftRadius: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingTop: 5,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
     },
+
 
     headerTitle: {
         fontSize: 24,
@@ -320,8 +330,8 @@ const styles = StyleSheet.create({
     },
 
     paymentBtn: {
-        paddingHorizontal: 22,
-        paddingVertical: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
         backgroundColor: '#fff',
         borderRadius: 14,
         marginRight: 12,
@@ -344,16 +354,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         marginHorizontal: 18,
         borderRadius: 20,
-        paddingVertical: 18,
+        paddingVertical: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
-
+        marginBottom: 12,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 3,
-        },
+        shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.04,
         shadowRadius: 6,
         elevation: 2,
@@ -374,7 +380,8 @@ const styles = StyleSheet.create({
     bookBtn: {
         backgroundColor: '#4ec28d',
         borderRadius: 12,
-        alignItems: 'center',
+        width: 200,
+        alignSelf: 'center',
     },
 
     bookBtnText: {
