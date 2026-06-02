@@ -187,7 +187,13 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                 </KeyboardAvoidingView >
             </Modal>
 
-            <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} 
+            <MapLocationPicker visible={locationModal} onClose={() => { setLocationModal(false); setSelectingType(null) }}
+                mapRegion={{
+                    latitude: 28.6139,
+                    longitude: 77.2090,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05
+                }}
                 onSelectLocation={({ latitude, longitude }) => {
                     const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
                     if (selectingType === 'pickup') {

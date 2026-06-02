@@ -1,87 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
+import MapView, { Marker } from "@teovilla/react-native-web-maps";
 import { Ionicons } from "@expo/vector-icons";
 
-const MapLocationPicker = ({ visible, onClose, onSelectLocation }) => {
-    const [region, setRegion] = useState({
-        latitude: 28.6139,
-        longitude: 77.2090,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-    });
+const GOOGLE_MAPS_API_KEY = "AIzaSyCfReUxeYM09BiDk-GjlOnPaa4u8HDXAfw";
 
-    const [marker, setMarker] = useState({
-        latitude: 28.6139,
-        longitude: 77.2090,
-    });
+const MapLocationPicker = ({ visible, onClose, mapRegion, onSelectLocation }) => {
+    const [selectedLocation, setSelectedLocation] = useState(null);
 
-    const getCurrentLocation = async () => {
-        try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                return;
-            }
+    useEffect(() => {
+        if (mapRegion) {
+            setSelectedLocation(mapRegion);
+        }
+    }, [mapRegion]);
 
-            const location = await Location.getCurrentPositionAsync({});
-            const newRegion = {
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            };
+    const handleSelect = () => {
+        if (selectedLocation) {
+            onSelectLocation(selectedLocation);
+        }
+        onClose();
+    };
 
-            setRegion(newRegion);
-            setMarker({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
-        } catch (error) {
-            console.log(error);
+    const handleMapPress = (e) => {
+        const coord = e?.nativeEvent?.coordinate;
+        if (coord) {
+            setSelectedLocation(coord);
         }
     };
 
-    const handleMapPress = (event) => {
-        const { latitude, longitude } =
-            event.nativeEvent.coordinate;
-        setMarker({ latitude, longitude });
-    };
-
-    const confirmLocation = () => {
-        onSelectLocation?.({
-            latitude: marker.latitude,
-            longitude: marker.longitude,
-        });
-
-        onClose?.();
-    };
-
     return (
-        <Modal visible={visible}  animationType="slide" onRequestClose={onClose}>
+        <Modal visible={visible} animationType="slide">
             <View style={styles.container}>
 
                 <View style={styles.header}>
+                    <Text style={styles.title}>Select Location</Text>
                     <TouchableOpacity onPress={onClose}>
-                        <Ionicons name="arrow-back" size={24} color="#000" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}> Select Location  </Text>
-                    <TouchableOpacity onPress={getCurrentLocation}>
-                        <Ionicons name="locate"  size={24} color="#000" />
+                        <Ionicons name="close" size={24} color="black" />
                     </TouchableOpacity>
                 </View>
 
-                <MapView style={styles.map} region={region} onPress={handleMapPress} showsUserLocation showsMyLocationButton>
-                    <Marker coordinate={marker} draggable onDragEnd={(e) => setMarker(e.nativeEvent.coordinate) }/>
-                </MapView>
-
-                <View style={styles.bottomContainer}>
-                    <Text style={styles.coordinates}> Lat: {marker.latitude.toFixed(5)} {"\n"} Lng: {marker.longitude.toFixed(5)} </Text>
-                    <TouchableOpacity style={styles.confirmBtn} onPress={confirmLocation} >
-                        <Text style={styles.confirmText}>  Confirm Location </Text>
-                    </TouchableOpacity>
+                <View style={styles.mapContainer}>
+                    <MapView provider="google" googleMapsApiKey={GOOGLE_MAPS_API_KEY} style={styles.map} initialRegion={mapRegion} onPress={handleMapPress}> {selectedLocation && (<Marker coordinate={selectedLocation} />)}
+                    </MapView>
                 </View>
 
+                <TouchableOpacity style={styles.button} onPress={handleSelect}>
+                    <Text style={styles.buttonText}>Confirm Location</Text>
+                </TouchableOpacity>
             </View>
         </Modal>
     );
@@ -92,50 +57,44 @@ export default MapLocationPicker;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#fff",
     },
 
     header: {
-        height: 70,
-        backgroundColor: "#4ec28d",
+        height: 60,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: 15,
-        paddingTop: 20,
-        borderBottomRightRadius: 20,
-        borderTopLeftRadius: 20,
+        borderBottomWidth: 1,
+        borderColor: "#ddd",
     },
 
-    headerTitle: {
-        fontSize: 22,
-        fontWeight: "700",
+    title: {
+        fontSize: 18,
+        fontWeight: "600",
+    },
+
+    mapContainer: {
+        flex: 1,
     },
 
     map: {
         flex: 1,
+        width: "100%",
+        height: "100%",
     },
 
-    bottomContainer: {
-        backgroundColor: "#fff",
+    button: {
+        backgroundColor: "#000",
+        margin: 15,
         padding: 15,
-    },
-
-    coordinates: {
-        fontSize: 14,
-        marginBottom: 12,
-        color: "#555",
-    },
-
-    confirmBtn: {
-        backgroundColor: "#4ec28d",
-        paddingVertical: 14,
-        borderRadius: 12,
+        borderRadius: 10,
         alignItems: "center",
     },
 
-    confirmText: {
+    buttonText: {
         color: "#fff",
-        fontSize: 16,
-        fontWeight: "700",
+        fontWeight: "600",
     },
 });
