@@ -52,13 +52,15 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        height: 80,
-        backgroundColor: "#4ec28d",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
+        height: 70,
+        backgroundColor: '#4ec28d',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 15,
         paddingTop: 20,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
     },
 
     headerTitle: {

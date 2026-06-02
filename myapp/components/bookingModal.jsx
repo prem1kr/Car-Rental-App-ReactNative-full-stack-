@@ -22,12 +22,6 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
     const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [locationModal, setLocationModal] = useState(false);
     const [selectingType, setSelectingType] = useState(null);
-    const [mapRegion, setMapRegion] = useState({
-        latitude: 28.6139,
-        longitude: 77.2090,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-    });
 
     const formatDate = (date) => {
         return date.toLocaleDateString('en-GB');
@@ -78,8 +72,6 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
 
     return (
         <>
-
-
             <Modal visible={visible} transparent={true} animationType="slide" statusBarTranslucent={true} >
                 <KeyboardAvoidingView style={{ flex: 1, width: '100%' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} >
@@ -195,7 +187,7 @@ const BookingModal = ({ visible, onClose, car, userId }) => {
                 </KeyboardAvoidingView >
             </Modal>
 
-            <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} mapRegion={mapRegion}
+            <MapLocationPicker visible={locationModal} onClose={() => setLocationModal(false)} 
                 onSelectLocation={({ latitude, longitude }) => {
                     const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
                     if (selectingType === 'pickup') {

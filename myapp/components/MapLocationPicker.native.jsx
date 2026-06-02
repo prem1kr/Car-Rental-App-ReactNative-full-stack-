@@ -1,56 +1,87 @@
 import React, { useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
-import { WebView } from "react-native-webview";
+import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 
 const MapLocationPicker = ({ visible, onClose, onSelectLocation }) => {
-    const [address, setAddress] = useState("");
+    const [region, setRegion] = useState({
+        latitude: 28.6139,
+        longitude: 77.2090,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+    });
 
-    const handleMessage = (event) => {
+    const [marker, setMarker] = useState({
+        latitude: 28.6139,
+        longitude: 77.2090,
+    });
+
+    const getCurrentLocation = async () => {
         try {
-            const data = JSON.parse(event.nativeEvent.data);
-            setAddress(data.address || "");
-            onSelectLocation?.({
-                latitude: data.latitude,
-                longitude: data.longitude,
-                address: data.address,
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+            const newRegion = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            };
+
+            setRegion(newRegion);
+            setMarker({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
             });
-            onClose?.();
         } catch (error) {
-            console.log("WebView message error:", error);
+            console.log(error);
         }
     };
 
+    const handleMapPress = (event) => {
+        const { latitude, longitude } =
+            event.nativeEvent.coordinate;
+        setMarker({ latitude, longitude });
+    };
+
+    const confirmLocation = () => {
+        onSelectLocation?.({
+            latitude: marker.latitude,
+            longitude: marker.longitude,
+        });
+
+        onClose?.();
+    };
+
     return (
-        <Modal visible={visible} animationType="slide" onRequestClose={onClose} >
+        <Modal visible={visible}  animationType="slide" onRequestClose={onClose}>
             <View style={styles.container}>
 
                 <View style={styles.header}>
                     <TouchableOpacity onPress={onClose}>
                         <Ionicons name="arrow-back" size={24} color="#000" />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>  Select Location </Text>
-                    <View style={{ width: 24 }} />
+                    <Text style={styles.headerTitle}> Select Location  </Text>
+                    <TouchableOpacity onPress={getCurrentLocation}>
+                        <Ionicons name="locate"  size={24} color="#000" />
+                    </TouchableOpacity>
                 </View>
 
-                {Platform.OS === "web" ? (
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }} >
-                        <Ionicons name="map-outline" size={60} color="#4ec28d" />
-                        <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 15 }} > Map Picker </Text>
-                        <Text style={{ textAlign: "center", marginTop: 10, color: "#666" }} >
-                            Map selection is available on Android and iOS.
-                            React Native WebView is not supported on Expo Web.
-                        </Text>
-                    </View>
-                ) : (
-                    <WebView style={styles.webview} originWhitelist={["*"]} javaScriptEnabled domStorageEnabled allowFileAccess allowUniversalAccessFromFileURLs onMessage={handleMessage}
-                        source={require("../assets/map/mapTemplate.html")} />)}
+                <MapView style={styles.map} region={region} onPress={handleMapPress} showsUserLocation showsMyLocationButton>
+                    <Marker coordinate={marker} draggable onDragEnd={(e) => setMarker(e.nativeEvent.coordinate) }/>
+                </MapView>
 
-                {address ? (
-                    <View style={styles.addressContainer}>
-                        <Text style={styles.addressText}>  {address} </Text>
-                    </View>
-                ) : null}
+                <View style={styles.bottomContainer}>
+                    <Text style={styles.coordinates}> Lat: {marker.latitude.toFixed(5)} {"\n"} Lng: {marker.longitude.toFixed(5)} </Text>
+                    <TouchableOpacity style={styles.confirmBtn} onPress={confirmLocation} >
+                        <Text style={styles.confirmText}>  Confirm Location </Text>
+                    </TouchableOpacity>
+                </View>
+
             </View>
         </Modal>
     );
@@ -61,15 +92,14 @@ export default MapLocationPicker;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
     },
 
     header: {
         height: 70,
-        backgroundColor: '#4ec28d',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "#4ec28d",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         paddingHorizontal: 15,
         paddingTop: 20,
         borderBottomRightRadius: 20,
@@ -77,24 +107,35 @@ const styles = StyleSheet.create({
     },
 
     headerTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: "700",
-        color: "#000",
     },
 
-    webview: {
+    map: {
         flex: 1,
     },
 
-    addressContainer: {
-        padding: 15,
-        borderTopWidth: 1,
-        borderTopColor: "#ddd",
+    bottomContainer: {
         backgroundColor: "#fff",
+        padding: 15,
     },
 
-    addressText: {
+    coordinates: {
         fontSize: 14,
-        color: "#333",
+        marginBottom: 12,
+        color: "#555",
+    },
+
+    confirmBtn: {
+        backgroundColor: "#4ec28d",
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+
+    confirmText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "700",
     },
 });
