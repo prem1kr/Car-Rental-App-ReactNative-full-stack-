@@ -45,7 +45,7 @@ const Payment = () => {
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={styles.userName}>Transaction #{item.transactionId || []}</Text>
+          <Text style={styles.userName}>Transaction {item.transactionId || []}</Text>
           <Text style={styles.carName}> {item.paymentMethod}</Text>
         </View>
 

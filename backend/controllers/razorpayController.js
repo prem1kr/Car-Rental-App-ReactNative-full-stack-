@@ -1,50 +1,74 @@
+import razorpay from "../config/razorpay.js";
+import bookingModel from "../models/bookingModel.js";
 import crypto from "crypto";
+import paymentModel from "../models/paymentModel.js";
+import authModel from "../models/authModel.js";
 
-export const createOrder = async (req, res) => {
+export const createRazorpayOrder = async (req, res) => {
     try {
-        const { amount } = req.body;
+        const { bookingId, amount } = req.body;
+        const booking = await bookingModel.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
 
         const options = {
             amount: amount * 100,
             currency: "INR",
-            receipt: `receipt_${Date.now()}`
+            receipt: `booking_${booking._id}`,
         };
-
+        booking.totalPrice = amount;
+        booking.save();
         const order = await razorpay.orders.create(options);
 
-        res.json({
-            success: true,
-            order
-        });
+        res.status(200).json({ success: true, order });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log(error);
+        res.status(500).json({ success: false, message: "Error creating Razorpay order" });
     }
 };
 
 
-export const verifyPayment = async (req, res) => {
+
+export const verifyPaymentController = async (req, res) => {
     try {
-        const {
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature
-        } = req.body;
+        const { bookingId, userId, razorpay_order_id, razorpay_payment_id, razorpay_signature,rewardUsed } = req.body;
+        const generatedSignature = crypto.createHmac("prem016", process.env.RAZORPAY_KEY_SECRET).update(razorpay_order_id + "|" + razorpay_payment_id).digest("hex");
 
-        const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-        const expectedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-            .update(body)
-            .digest("hex");
-
-        if (expectedSignature === razorpay_signature) {
-            return res.json({ success: true, message: "Payment verified" });
-        } else {
-            return res.status(400).json({ success: false, message: "Invalid signature" });
+        if (generatedSignature !== razorpay_signature) {
+            return res.status(400).json({ success: false, message: "Payment verification failed" });
         }
 
+        const booking = await bookingModel.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
+
+        const payment = await paymentModel.create({
+            bookingId,
+            userId,
+            rewardUsed,
+            amount: booking.totalPrice,
+            paymentMethod: "Razorpay",
+            paymentStatus: "Paid",
+        });
+
+        booking.paymentStatus = "Paid";
+        booking.paymentMethod = "Razorpay";
+        booking.status = "Confirmed";
+        await booking.save();
+
+        if (rewardUsed > 0) {
+            await authModel.findByIdAndUpdate(userId,
+                { $inc: { totalReferralEarnings: -rewardUsed } },
+                { new: true }
+            );
+        }
+        res.status(200).json({ success: true, message: "Payment successful", payment });
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log(error);
+        res.status(500).json({ success: false, message: "Payment verification error" });
     }
 };

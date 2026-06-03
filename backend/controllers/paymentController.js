@@ -3,7 +3,7 @@ import paymentModel from "../models/paymentModel.js";
 
 export const createPaymentController = async (req, res) => {
     try {
-        const { bookingId, userId, amount, paymentMethod, transactionId } = req.body;
+        const { bookingId, userId, amount, paymentMethod } = req.body;
         if (!bookingId || !userId || !amount || !paymentMethod) {
             return res.status(400).send({ success: false, message: "Please provide all fields" });
         }
@@ -18,7 +18,6 @@ export const createPaymentController = async (req, res) => {
             userId,
             amount,
             paymentMethod,
-            transactionId,
             paymentStatus:"Pending",
         });
 

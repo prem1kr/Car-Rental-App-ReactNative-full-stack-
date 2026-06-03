@@ -17,6 +17,7 @@ import addressRouter from "./routes/addressRoute.js";
 import referalRouter from "./routes/referalRoute.js";
 import paymentRoute from "./routes/paymentCardsRoute.js";
 import paymentsRouter from "./routes/paymentRoute.js";
+import razorpayRouter from "./routes/razorpayRoute.js";
 
 dotenv.config();
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/address', addressRouter);
 app.use('/api/payment', paymentRoute);
 app.use('/api/referal', referalRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/razorpay', razorpayRouter);
 
 app.get('/test-mail', async (req, res) => {
     try {

@@ -12,6 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { referalDetails } from "../../hooks/useReferal";
 import { setReferal } from "../../features/referalSlice";
 import OrderPlacedSuccessModal from "../../components/orderPlaced";
+import { createOrder, verifyPayment } from "../../hooks/userRazorpay";
+import RazorpayCheckout from "react-native-razorpay";
 
 const PaymentScreen = () => {
     const router = useRouter();
@@ -20,7 +22,6 @@ const PaymentScreen = () => {
     const bookingData = JSON.parse(booking);
     const offers = useSelector(state => state.offer.offer || []);
     const [paymentMethod, setPaymentMethod] = useState("UPI");
-    const [transactionId, setTransactionId] = useState("");
     const [loading, setLoading] = useState(false);
     const [verifyVisible, setVerifyVisible] = useState(false);
     const [paymentSuccessVisible, setPaymentSuccessVisible] = useState(false);
@@ -73,41 +74,81 @@ const PaymentScreen = () => {
     const originalPrice = bookingData?.totalPrice || 0;
     const finalPrice = Math.max(originalPrice - discountAmount - rewardAmount, 0);
 
-    const startPaymentFlow = () => {
-        setVerifyVisible(true);
-        setTimeout(() => {
-            setVerifyVisible(false);
-            setPaymentSuccessVisible(true);
-        }, 5000);
-    };
-
     const handlePayment = async () => {
         try {
-            if (paymentMethod !== "Cash" && !transactionId) {
-                return Alert.alert("Error", "Please enter transaction ID");
-            }
             setLoading(true);
-            const payload = {
-                bookingId: bookingData?._id,
-                userId: bookingData?.userId?.toString?.() || bookingData?.userId,
-                amount: finalPrice,
-                paymentMethod,
-                transactionId,
+
+            if (paymentMethod === "Cash") {
+
+                const payload = {
+                    bookingId: bookingData?._id,
+                    userId: bookingData?.userId?.toString?.() || bookingData?.userId,
+                    amount: finalPrice,
+                    paymentMethod: "Cash",
+                };
+
+                const res = await createPayments(payload);
+                if (res.success) {
+                    dispatch(setPayments(res.payment));
+                    setOrderSuccessVisible(true);
+                }
+
+                return;
+            }
+
+            const response = await createOrder(
+                bookingData?._id,
+                finalPrice
+            );
+
+            if (!response?.success) {
+                return Alert.alert("Error", "Unable to create order");
+            }
+
+            const options = {
+                description: "Car Rental Booking",
+                currency: "INR",
+                key: "rzp_test_Sx59JHrNY040Wz",
+                amount: response.order.amount,
+                order_id: response.order.id,
+                name: "Car Rental App",
+                prefill: {
+                    name: user?.name || "",
+                    email: user?.email || "",
+                    contact: user?.phone || "",
+                },
+
+                theme: { color: "#1F8A70" }
             };
 
-            const res = await createPayments(payload);
-            if (res.success) {
-                dispatch(setPayments(res.payment));
-                if (paymentMethod === "Cash") {
-                    setOrderSuccessVisible(true);
-                } else {
-                    startPaymentFlow();
-                }
+            const payment = await RazorpayCheckout.open(options);
+
+            setVerifyVisible(true);
+
+            const verifyRes = await verifyPayment({
+                bookingId: bookingData?._id,
+                rewardUsed: rewardAmount,
+                userId: bookingData?.userId?.toString?.() || bookingData?.userId,
+                razorpay_order_id: payment.razorpay_order_id,
+                razorpay_payment_id: payment.razorpay_payment_id,
+                razorpay_signature: payment.razorpay_signature,
+            });
+
+            setVerifyVisible(false);
+
+            if (verifyRes.success) {
+                dispatch(setPayments(verifyRes.payment));
+                setPaymentSuccessVisible(true);
+            } else {
+                Alert.alert("Failed", verifyRes.message || "Payment verification failed"
+                );
             }
 
         } catch (error) {
-            console.log("ERROR =>", error?.response?.data || error.message);
-            Alert.alert("Error", error?.response?.data?.message || "Payment failed");
+            console.log("ERROR =>", error);
+            setVerifyVisible(false);
+            Alert.alert("Payment Failed", error?.description || error?.message || "Something went wrong");
+
         } finally {
             setLoading(false);
         }
@@ -133,7 +174,6 @@ const PaymentScreen = () => {
     return (
         <View style={styles.container}>
 
-            {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
@@ -143,7 +183,6 @@ const PaymentScreen = () => {
 
             <ScrollView showsVerticalScrollIndicator={false}>
 
-                {/* Booking Details */}
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>Booking Details</Text>
 
@@ -175,8 +214,6 @@ const PaymentScreen = () => {
                         </Text>
                     </View>
                 </View>
-
-                {/* Payment Summary */}
 
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>Payment Summary</Text>
@@ -234,9 +271,6 @@ const PaymentScreen = () => {
                         )}
                     </View>
                     }
-
-
-
                 </View>
 
                 <View style={styles.card}>
@@ -258,21 +292,13 @@ const PaymentScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                {paymentMethod !== "Cash" && (
-                    <View style={styles.card}>
-                        <Text style={styles.sectionTitle}>Transaction ID</Text>
-                        <TextInput placeholder="Enter transaction ID" value={transactionId} onChangeText={setTransactionId} style={styles.input} placeholderTextColor="#999" />
-                    </View>
-                )}
-
                 <LoadingButton title={`Pay ₹ ${finalPrice}`} style={styles.payBtn} onPress={handlePayment} loading={loading} />
 
             </ScrollView>
 
-            {/* Modals */}
             <VerifyingPaymentModal visible={verifyVisible} onClose={() => setVerifyVisible(false)} />
-            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} transactionId={transactionId} amount={finalPrice} paymentMethod={paymentMethod} />
-            <OrderPlacedSuccessModal visible={orderSuccessVisible} onClose={() => setOrderSuccessVisible(false)}/>
+            <PaymentSuccessModal visible={paymentSuccessVisible} onClose={() => setPaymentSuccessVisible(false)} amount={finalPrice} paymentMethod={paymentMethod} />
+            <OrderPlacedSuccessModal visible={orderSuccessVisible} onClose={() => setOrderSuccessVisible(false)} />
         </View>
     );
 };

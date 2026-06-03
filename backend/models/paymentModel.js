@@ -21,7 +21,7 @@ const paymentSchema = new mongoose.Schema(
 
         paymentMethod: {
             type: String,
-            enum: ["Cash", "UPI", "Card"],
+            enum: ["Cash", "UPI", "Card","Razorpay"],
             required: true,
         },
 
@@ -35,7 +35,6 @@ const paymentSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
-    }, { timestamps: true }
-);
+    }, { timestamps: true });
 
 export default mongoose.model("Payments", paymentSchema);
