@@ -17,10 +17,11 @@ export const createRazorpayOrder = async (req, res) => {
             currency: "INR",
             receipt: `booking_${booking._id}`,
         };
+        
         booking.totalPrice = amount;
-        booking.save();
-        const order = await razorpay.orders.create(options);
+        await booking.save();
 
+        const order = await razorpay.orders.create(options);
         res.status(200).json({ success: true, order });
 
     } catch (error) {
@@ -33,7 +34,7 @@ export const createRazorpayOrder = async (req, res) => {
 
 export const verifyPaymentController = async (req, res) => {
     try {
-        const { bookingId, userId, razorpay_order_id, razorpay_payment_id, razorpay_signature,rewardUsed } = req.body;
+        const { bookingId, userId, razorpay_order_id, razorpay_payment_id, razorpay_signature, rewardUsed } = req.body;
         const generatedSignature = crypto.createHmac("prem016", process.env.RAZORPAY_KEY_SECRET).update(razorpay_order_id + "|" + razorpay_payment_id).digest("hex");
 
         if (generatedSignature !== razorpay_signature) {

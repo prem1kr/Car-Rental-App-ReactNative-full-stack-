@@ -77,7 +77,7 @@ const PaymentScreen = () => {
     const handlePayment = async () => {
         try {
             setLoading(true);
-
+            
             if (paymentMethod === "Cash") {
 
                 const payload = {
@@ -96,10 +96,8 @@ const PaymentScreen = () => {
                 return;
             }
 
-            const response = await createOrder(
-                bookingData?._id,
-                finalPrice
-            );
+
+            const response = await createOrder(bookingData?._id,finalPrice);
 
             if (!response?.success) {
                 return Alert.alert("Error", "Unable to create order");
@@ -403,7 +401,6 @@ const styles = StyleSheet.create({
 
     payBtn: {
         backgroundColor: "#1F8A70",
-        paddingVertical: 16,
         borderRadius: 14,
         alignItems: "center",
         marginTop: 10,
