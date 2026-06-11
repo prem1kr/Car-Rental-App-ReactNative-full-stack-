@@ -30,7 +30,7 @@ const Signup = () => {
                 }
             );
             if (res.data.success) {
-                await AsyncStorage.setItem("userId", res.data.user.id);
+                await AsyncStorage.setItem("userId", res.data.user._id);
                 Alert.alert("Success", "Signup successful");
                 setOpenPopup(true);
             }
